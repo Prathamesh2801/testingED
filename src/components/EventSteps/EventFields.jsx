@@ -139,7 +139,7 @@ function EventFields({ onSubmit, onPrevious, initialData = [] }) {
                     {/* Rest of your existing code */}
                     {fields.map((field, index) => (
                         <div key={index} className="mb-4 p-4 border rounded-lg">
-                            <div className="grid grid-cols-4 gap-4">
+                            <div className="grid grid-cols-4 gap-8">
                                 <div>
                                     <label className="block mb-2 text-sm font-medium text-gray-600">
                                         Field Name

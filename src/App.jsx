@@ -8,17 +8,21 @@ import Login from './components/Login'
 import GeoLocation from './components/GeoLocation'
 import { ProtectedRoutes } from './routes/ProtectedRoutes'
 import EventRegistrationTemp from './components/EventRegistrationTemp'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
     <HashRouter>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+      />
       <Routes>
         <Route path="/eventForm/:eventId" element={<RegistrationForm />} />
         <Route path="/upload" element={<WebcamComponent />} />
         <Route path="/success/:id" element={<SuccessWelcome />} />
         <Route path="/geolocation" element={<GeoLocation />} />
-        <Route path="/temp/:eventId" element={<EventRegistrationTemp/>} />
-
+        <Route path="/temp/:eventId" element={<EventRegistrationTemp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={
           <ProtectedRoutes>

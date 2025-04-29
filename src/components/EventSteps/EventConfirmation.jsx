@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAllEvents } from '../../utils/EventFetchApi'
+import toast from 'react-hot-toast';
 
 export default function EventConfirmation({ onRefresh }) {
   const [status, setStatus] = useState('loading');
@@ -9,11 +10,14 @@ export default function EventConfirmation({ onRefresh }) {
   useEffect(() => {
     const timer = setTimeout(async () => {
       setStatus('success');
-      
+
       try {
         // Fetch latest events data
         const refreshedData = await getAllEvents();
-        
+
+        toast.success('Event created successfully!', {
+          duration: 2000,
+        });
         // Short delay before navigation to ensure UI animation completes
         setTimeout(() => {
           if (onRefresh) {

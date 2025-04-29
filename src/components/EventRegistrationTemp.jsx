@@ -9,6 +9,7 @@ import QrCode from "../assets/img/qrcode.jpg"
 import DownloadIcon from "../assets/vid/download.gif"
 import { fetchEvents, registerEvent } from "../utils/EventFetchApi"
 import { API_BASE_URL } from "../config"
+import TempBG from '../assets/vid/tempBG.mp4'
 
 // Main component that manages screen state
 export default function EventRegistrationTemp() {
@@ -54,7 +55,10 @@ export default function EventRegistrationTemp() {
 
   // Render the appropriate screen based on state
   return (
-    <div className="flex min-h-screen flex-col items-center pt-28 bg-gradient-to-b from-[#f8b7c1] to-[#d8b7e0] p-4">
+    <div className="flex min-h-screen flex-col items-center pt-8 bg-gradient-to-b from-[#f8b7c1] to-[#d8b7e0] p-4">
+      {/* <video  autoPlay >
+        <source  src={TempBG} />
+      </video> */}
       <div className="w-full max-w-sm flex flex-col items-center">
         {currentScreen === "register" && (
           <RegisterScreen

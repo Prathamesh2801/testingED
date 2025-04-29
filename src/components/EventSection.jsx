@@ -1,63 +1,89 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import DisplayEvents from './DisplayEvents';
-import CreateNewEvent from './CreateNewEvent';
-import { API_BASE_URL } from '../config';
+"use client"
+import { useNavigate, useLocation } from "react-router-dom"
+import DisplayEvents from "./DisplayEvents"
+import CreateNewEvent from "./CreateNewEvent"
+import ViewEvent from "./ViewEvent"
+import { useState, useEffect } from "react"
 
-export default function EventSection({ events, loading, error, pagination, handlePageChange,setEvents }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get the current event view from query parameter or default to 'display'
-  const queryParams = new URLSearchParams(location.search);
+export default function EventSection({ events, loading, error, pagination, handlePageChange, setEvents, onRefresh }) {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [currentView, setCurrentView] = useState("display")
+  const [viewEventId, setViewEventId] = useState(null)
 
-  const eventView = queryParams.get('view') || 'display';
+  // Get parameters from the URL query string
+  const queryParams = new URLSearchParams(location.search)
+  const viewParam = queryParams.get("view")
+  const eventIdParam = queryParams.get("eventId")
 
-    // Handle refreshing events after creation
-    const handleEventRefresh = (refreshedData) => {
-      if (refreshedData && refreshedData.events) {
-        setEvents(refreshedData.events);
-      }
-    };
-  
+  // Set the view based on URL parameters on initial load and when they change
+  useEffect(() => {
+    console.log("URL params changed:", { viewParam, eventIdParam })
+
+    if (viewParam) {
+      setCurrentView(viewParam)
+    }
+
+    if (eventIdParam) {
+      setViewEventId(eventIdParam)
+    }
+  }, [location.search, viewParam, eventIdParam])
+
+  // Handle view event 
+  const handleEventView = (eventId) => {
+    setViewEventId(eventId);
+    setCurrentView("viewEvent");
+    navigate(`/dashboard?tab=events&view=viewEvent&eventId=${eventId}`);
+  };
+
   // Handle navigation between event views
   const toggleEventView = () => {
-    const newView = eventView === 'display' ? 'create' : 'display';
-    navigate(`/dashboard?tab=events&view=${newView}`);
-  };
-  
+    if (currentView === "viewEvent") {
+      setCurrentView("display");
+      navigate(`/dashboard?tab=events`);
+    } else {
+      const newView = currentView === "display" ? "create" : "display";
+      setCurrentView(newView);
+      navigate(`/dashboard?tab=events&view=${newView}`);
+    }
+  }
+
   return (
     <div>
       {/* Button to toggle between views */}
       <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between mb-6">
         <h3 className="text-base font-semibold text-gray-900">
-          {eventView === 'create' ? 'Create New Event' : 'Events List'}
+          {currentView === "create" ? "Create New Event" : 
+           currentView === "viewEvent" ? "View Event Details" : "Events List"}
         </h3>
         <div className="mt-3 sm:mt-0 sm:ml-4">
           <button
             type="button"
             onClick={toggleEventView}
-            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="inline-flex items-center rounded-2xl bg-emerald-700 px-3 py-2 text-md font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            {eventView === 'display' ? 'Create New Event' : 'Display All Events'}
+            {currentView === "display" ? "Create New Event" : 
+             currentView === "viewEvent" ? "Back to Events" : "Display All Events"}
           </button>
         </div>
       </div>
-      
-      {/* Render the appropriate component based on the eventView */}
-      {eventView === 'create' ? (
-        <CreateNewEvent onRefresh={handleEventRefresh} />
+
+      {/* Render the appropriate component based on the currentView */}
+      {currentView === "create" ? (
+        <CreateNewEvent onRefresh={onRefresh} />
+      ) : currentView === "viewEvent" ? (
+        <ViewEvent viewEventId={viewEventId} />
       ) : (
-        <DisplayEvents 
-          events={events} 
-          loading={loading} 
-          error={error} 
-          pagination={pagination} 
-          handlePageChange={handlePageChange}
-          navigate={navigate}
-          API_BASE_URL={API_BASE_URL}
+        <DisplayEvents
+          events={events}
+          loading={loading}
+          error={error}
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          onRefresh={onRefresh}
+          onEventView={handleEventView}
         />
       )}
     </div>
-  );
+  )
 }

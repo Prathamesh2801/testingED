@@ -1,10 +1,12 @@
 import React from 'react'
-import { createEvent } from '../../utils/EventFetchApi'; 
+import { createEvent, getAllEvents } from '../../utils/EventFetchApi';
 
-export default function EventPreview({ formData, onSubmit, onPrevious }) {
+export  default  function EventPreview({ formData, onSubmit, onPrevious }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     
+
     // Format fields to match required structure
     const formattedFields = formData.fields.map(field => {
       const baseField = {
@@ -51,27 +53,10 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
       fields: formattedFields,
       communication: formData.communication
     };
-    
-    // Show data structure in an alert before sending
-    const dataPreview = {
-      Event_Name: formData.basicInfo.eventName,
-      Event_Start_Date: formData.basicInfo.startDate,
-      Event_End_Date: formData.basicInfo.endDate,
-      Event_Logo: formData.basicInfo.eventLogo ? formData.basicInfo.eventLogo.name : "No file selected",
-      Table_Structure: formattedFields, // Use formatted fields here
-      Event_IsEmail: formData.communication.contactMethods.email ? "1" : "0",
-      Event_Email_Column_Name: formData.communication.contactMethods.email ? formData.communication.contactMethods.emailField : "",
-      Event_WhatsApp_Template_ID: formData.communication.contactMethods.whatsapp ? formData.communication.contactMethods.whatsappTemplateId : "",
-      Event_WhatsApp_Column_Name: formData.communication.contactMethods.whatsapp ? formData.communication.contactMethods.whatsappField : "",
-      Event_IsQuiz: formData.communication.contactMethods.quiz ? "1" : "0",
-      Event_IsPoll: formData.communication.contactMethods.polls ? "1" : "0",
-      Event_IsQRCode: formData.communication.contactMethods.qrCode ? "1" : "0",
-      Event_IsFaceRec: formData.communication.contactMethods.faceRegistration ? "1" : "0"
-    };
 
-    // Show formatted data in an alert
-    alert("Data to be submitted:\n" + JSON.stringify(dataPreview, null, 2));
-    
+    console.log("API Data to be sent:", apiData);
+
+
     try {
       // Call the API function to create the event
       const result = await createEvent(apiData);
@@ -86,7 +71,7 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
   return (
     <div className="max-w-5xl mx-auto">
       <h2 className="text-2xl font-semibold mb-6">Event Preview</h2>
-      
+
       {/* Basic Info Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Basic Information</h3>
@@ -111,7 +96,7 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
           </div>
         </div>
       </div>
-      
+
       {/* Fields Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Event Fields</h3>
@@ -131,8 +116,8 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{field.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {field.type === 'enum' 
-                        ? `ENUM (${field.enumValues.join(', ')})` 
+                      {field.type === 'enum'
+                        ? `ENUM (${field.enumValues.join(', ')})`
                         : `${field.type.toUpperCase()}${field.length ? `(${field.length})` : ''}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -150,7 +135,7 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
           <p className="text-gray-500">No fields added.</p>
         )}
       </div>
-      
+
       {/* Communication Methods Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Communication Methods</h3>
@@ -158,8 +143,8 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
           <div>
             <p className="text-sm text-gray-500">WhatsApp</p>
             <p className="font-medium">
-              {formData.communication.contactMethods.whatsapp 
-                ? `Enabled (Field: ${formData.communication.contactMethods.whatsappField})` 
+              {formData.communication.contactMethods.whatsapp
+                ? `Enabled (Field: ${formData.communication.contactMethods.whatsappField})`
                 : 'Disabled'}
             </p>
             {formData.communication.contactMethods.whatsapp && formData.communication.contactMethods.whatsappTemplateId && (
@@ -169,8 +154,8 @@ export default function EventPreview({ formData, onSubmit, onPrevious }) {
           <div>
             <p className="text-sm text-gray-500">Email</p>
             <p className="font-medium">
-              {formData.communication.contactMethods.email 
-                ? `Enabled (Field: ${formData.communication.contactMethods.emailField})` 
+              {formData.communication.contactMethods.email
+                ? `Enabled (Field: ${formData.communication.contactMethods.emailField})`
                 : 'Disabled'}
             </p>
           </div>
