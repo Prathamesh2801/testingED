@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { getAllEvents } from "../utils/EventFetchApi"
+import Logo from "../assets/img/logo.png"
 
 // import DashboardIcon from '../assets/img/dashboardIcon.png'
 import { Bars3Icon, IdentificationIcon, UsersIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import EventSection from "./EventSection"
 import Credentials from "./Credentials"
+import CredentialSection from "./CredentialSection"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -125,7 +127,7 @@ function DashBoard() {
           />
         )
       case "credentials":
-        return <Credentials />
+        return <CredentialSection />
 
       default:
         return (
@@ -202,11 +204,11 @@ function DashBoard() {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
-          <div className="flex h-16 shrink-0 items-center">
+          <div className="flex pt-5 h-16 shrink-0 items-center">
             <img
               alt="Zeal Interactive Services"
-              src="https://www.zealinteractive.in/wp-content/uploads/2024/10/Zeal-interactive-Logo.png"
-              className="h-8 w-auto"
+              src={Logo}
+              className="h-14 w-auto"
             />
           </div>
           <nav className="flex flex-1 flex-col  ">
@@ -218,7 +220,7 @@ function DashBoard() {
                     onClick={(e) => handleNavClick(e, item.name)}
                     className={classNames(
                       item.current
-                        ? "text-white bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)] w-[205px] h-[40px] shrink-0 rounded-[0px_12px_70px_0px] "
+                        ? "text-white bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)] w-[225px] h-[40px] shrink-0 rounded-[0px_12px_70px_0px] "
                         : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                       "group flex gap-x-3 p-2 text-sm font-semibold",
                     )}

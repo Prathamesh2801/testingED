@@ -12,11 +12,11 @@ import {
 import { rankItem } from "@tanstack/match-sorter-utils"
 import { API_BASE_URL } from "../config"
 import { deleteEvent, getEventById } from "../utils/EventFetchApi"
-import {toast} from 'react-hot-toast'
-import {TrashIcon,EyeIcon} from '@heroicons/react/24/outline'
+import { toast } from 'react-hot-toast'
+import { TrashIcon, EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
-export default function DisplayEvents({ events = [], loading, error, pagination, onPageChange ,onRefresh,onEventView}) {
-  console.log("DisplayEvents received:", { events, loading, error, pagination }) // Debug log
+export default function DisplayEvents({ events = [], loading, error, pagination, onPageChange, onRefresh, onEventView }) {
+
 
   if (loading) {
     return (
@@ -51,14 +51,14 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
   const handleDeleteEvent = async (eventId) => {
 
     try {
-      await deleteEvent(eventId); // you don't need to check response.ok etc.
+      await deleteEvent(eventId);
       // Refresh the events list
       if (onPageChange) {
         onRefresh()
-        toast.success("Event deleted successfully",{
+        toast.success("Event deleted successfully", {
           duration: 2000,
         })
-        onPageChange(1, pagination.limit); // Go to first page or you can reload current page
+        onPageChange(1, pagination.limit);
       }
     } catch (error) {
       console.error("Error deleting event:", error);
@@ -138,6 +138,12 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
                 Email
               </span>
             )}
+            {info.row.original.IsEmail !== "1" && info.row.original.IsFaceRec !== "1" && info.row.original.IsQRCode !== "1" && (
+              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                None
+              </span>
+            )}
+
           </div>
         ),
       },
@@ -150,13 +156,13 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
               onClick={() => handleEventView(info.row.original.Event_ID)}
               className="text-indigo-600 hover:text-indigo-900"
             >
-              <EyeIcon className="h-5 w-5" aria-hidden="true" />
+              <EyeIcon className="h-7 w-7" aria-hidden="true" />
             </button>
             <button
               onClick={() => handleDeleteEvent(info.row.original.Event_ID)}
               className="text-red-600 hover:text-red-900"
             >
-              <TrashIcon className="h-5 w-5" aria-hidden="true" />
+              <TrashIcon className="h-7 w-7" aria-hidden="true" />
             </button>
           </div>
         ),
@@ -200,9 +206,9 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
   return (
     <div className="p-4 bg-gray-200 rounded-lg shadow-md">
       <div className="flex justify-between mb-6">
-        
+
         <div className="flex items-center gap-4">
-        
+
           <div>
             <span className="mr-2">
               Page {pagination?.page || 1} of {pagination?.total_pages || 1}
@@ -230,7 +236,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search Events..."
-          className="border px-6 py-2 rounded-3xl bg-white text-gray-900 "
+          className="border px-6  py-2 rounded-2xl w-1/4 bg-white text-gray-900 "
         />
       </div>
 
@@ -246,7 +252,15 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
                 >
                   <div className="flex items-center">
                     {flexRender(header.column.columnDef.header, header.getContext())}
-                    {{ asc: " 🔼", desc: " 🔽" }[header.column.getIsSorted()] ?? null}
+                    {{
+                      asc: <ChevronUpIcon
+                        aria-hidden="true"
+                        className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
+                      />, desc: <ChevronDownIcon
+                        aria-hidden="true"
+                        className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
+                      />
+                    }[header.column.getIsSorted()] ?? null}
                   </div>
                 </th>
               ))}

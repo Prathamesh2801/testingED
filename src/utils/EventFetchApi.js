@@ -195,7 +195,7 @@ export const createEvent = async (eventData) => {
             formDataObj,
             {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Make sure Bearer prefix is added
+                    'Authorization': `Bearer ${token}`, 
                     'Content-Type': 'multipart/form-data',
                     'Accept': 'application/json'
                 }
@@ -260,32 +260,25 @@ export const deleteEvent = async (eventId) => {
 
 export const getEventById = async (eventId) => {
   try {
-    // 1. Hit the correct PHP script with the proper query param
     const response = await axios.get(
       `${API_BASE_URL}/Admin/event.php`,
       {
         params: { Event_ID: eventId },
         headers: {
           'Content-Type': 'application/json',
-          // If you’re using Bearer tokens:
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        // optional: timeout, withCredentials, etc.
       }
     );
 
-    // 2. Axios throws on non-2xx, so if we’re here, status is 2xx
     return response.data; 
   } catch (error) {
-    // 3. Drill into error.response to surface backend messages
     if (error.response) {
-      // Server responded with 4xx/5xx
       console.error('API error:', error.response.data);
       throw new Error(
         error.response.data.message || `Server Error (${error.response.status})`
       );
     } else {
-      // Network error / timeout / CORS
       console.error('Network or CORS error:', error.message);
       throw new Error('Unable to reach server. Please try again later.');
     }
