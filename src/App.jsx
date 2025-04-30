@@ -9,6 +9,10 @@ import GeoLocation from './components/GeoLocation'
 import { ProtectedRoutes } from './routes/ProtectedRoutes'
 import EventRegistrationTemp from './components/EventRegistrationTemp'
 import { Toaster } from 'react-hot-toast'
+import ClientDashboard from './components/ClientDashboard'
+import ClientLogin from './components/ClientLogin'
+import { ProtectedClientRoutes } from './routes/ProtectedClientRoutes'
+import ErrorPage from './components/ErrorPage'
 
 function App() {
   return (
@@ -24,6 +28,11 @@ function App() {
         <Route path="/geolocation" element={<GeoLocation />} />
         <Route path="/temp/:eventId" element={<EventRegistrationTemp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/clientLogin/:eventId" element={<ClientLogin />} />
+        <Route path="/noauth" element={<ErrorPage title="Access Denied" msg="Log through proper credentials" status={401}/>} />
+        <Route path="/clientDashboard" element={<ProtectedClientRoutes>
+          <ClientDashboard />
+        </ProtectedClientRoutes>} />
         <Route path="/dashboard" element={
           <ProtectedRoutes>
             <DashBoard />

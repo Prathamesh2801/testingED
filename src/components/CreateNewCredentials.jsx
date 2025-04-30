@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { getAllEvents } from '../utils/EventFetchApi'
+import { useNavigate } from 'react-router-dom'
+import { createCredential } from '../utils/Credentials'
+import toast from 'react-hot-toast'
 
 export default function CreateNewCredentials() {
     const [formData, setFormData] = useState({
@@ -10,20 +13,20 @@ export default function CreateNewCredentials() {
         role: 'Admin',
         eventId: ''
     })
-    
+
     const [showEventId, setShowEventId] = useState(false)
     const [events, setEvents] = useState([])
     const [filteredEvents, setFilteredEvents] = useState([])
     const [isSearching, setIsSearching] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    
+    const navigate = useNavigate();
     // Fetch events on component mount
     useEffect(() => {
         const loadEvents = async () => {
             try {
                 setIsLoading(true)
-                const response = await getAllEvents(1,100) 
-              
+                const response = await getAllEvents(1, 100)
+
                 if (response && response.events) {
                     const eventIds = response.events.events.map(event => event.Event_ID)
                     setEvents(eventIds)
@@ -34,14 +37,13 @@ export default function CreateNewCredentials() {
                 setIsLoading(false)
             }
         }
-        
         loadEvents()
     }, [])
-    
+
     // Handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target
-        
+
         if (name === 'role') {
             setShowEventId(value === 'Client')
             setFormData({
@@ -53,13 +55,13 @@ export default function CreateNewCredentials() {
                 ...formData,
                 [name]: value
             })
-            
+
             // Implement fuzzy search for Event ID
             if (value.trim() === '') {
                 setFilteredEvents([])
                 setIsSearching(false)
             } else {
-                const filtered = events.filter(eventId => 
+                const filtered = events.filter(eventId =>
                     eventId.toLowerCase().includes(value.toLowerCase())
                 )
                 setFilteredEvents(filtered)
@@ -72,7 +74,7 @@ export default function CreateNewCredentials() {
             })
         }
     }
-    
+
     // Handle event selection from dropdown
     const handleEventSelect = (eventId) => {
         setFormData({
@@ -81,21 +83,57 @@ export default function CreateNewCredentials() {
         })
         setIsSearching(false)
     }
-    
-    // Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        // Add your form submission logic here
-        console.log('Form submitted:', formData)
+
+
+
+
+    // Handle form submission  Validate Required Fields
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+
+            // if (!formData.username || !formData.password || (formData.role === "Client" && !formData.eventId)) {
+            //     toast.error("Please fill all required fields");
+            //     return;
+            // }
+            const response = await createCredential(formData);
+            toast.success("Credential created successfully!");
+
+            // Redirect to credentials list after a short delay
+            setTimeout(() => {
+                navigate('/dashboard?tab=credentials&view=display');
+            }, 500);
+        } catch (error) {
+            toast.error(error.message || "Failed to create credential");
+        }
+    };
+
+    const handleCancel = () => {
+        // Reset form data or navigate away
+        setFormData({
+            username: '',
+            password: '',
+            role: 'Admin',
+            eventId: ''
+        })
+        setShowEventId(false)
+        setFilteredEvents([])
+        setIsSearching(false)
+        setTimeout(() => {
+            navigate('/dashboard?tab=credentials&view=display')
+        }, 1000);
     }
-    
+
+
+
     return (
         <form onSubmit={handleSubmit}>
             <div className="space-y-12 sm:space-y-10">
                 <div>
                     <h2 className="text-base/7 font-semibold text-gray-900">Profile</h2>
                     <p className="mt-1 max-w-2xl text-sm/6 text-gray-600">
-                        This information will be displayed publicly so be careful what you share.
+                        This information will be displayed on Credentials and can be visible to other users.
                     </p>
                 </div>
 
@@ -158,7 +196,7 @@ export default function CreateNewCredentials() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         {showEventId && (
                             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                                 <label htmlFor="eventId" className="block text-sm/6 font-medium text-gray-900 sm:pt-1.5">
@@ -174,13 +212,13 @@ export default function CreateNewCredentials() {
                                         autoComplete="off"
                                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:max-w-md sm:text-sm/6"
                                     />
-                                    
+
                                     {/* Fuzzy search dropdown */}
                                     {isSearching && filteredEvents.length > 0 && (
                                         <div className="absolute z-10 mt-1 w-full max-w-md bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                                             <ul className="py-1">
                                                 {filteredEvents.map((eventId, index) => (
-                                                    <li 
+                                                    <li
                                                         key={index}
                                                         className="px-3 py-2 text-sm text-gray-700 hover:bg-indigo-100 cursor-pointer"
                                                         onClick={() => handleEventSelect(eventId)}
@@ -191,13 +229,13 @@ export default function CreateNewCredentials() {
                                             </ul>
                                         </div>
                                     )}
-                                    
+
                                     {isSearching && filteredEvents.length === 0 && (
                                         <div className="absolute z-10 mt-1 w-full max-w-md bg-white border border-gray-300 rounded-md shadow-lg p-2">
                                             <p className="text-sm text-gray-500">No matching events found</p>
                                         </div>
                                     )}
-                                    
+
                                     {isLoading && (
                                         <div className="absolute z-10 mt-1 w-full max-w-md bg-white border border-gray-300 rounded-md shadow-lg p-2">
                                             <p className="text-sm text-gray-500">Loading events...</p>
@@ -210,13 +248,13 @@ export default function CreateNewCredentials() {
                 </div>
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-x-6">
-                <button type="button" className="text-sm/6 font-semibold text-gray-900">
+            <div className="mt-8  flex items-center justify-end gap-x-8">
+                <button onClick={handleCancel} type="button" className="text-lg px-10 py-3  font-semibold text-gray-900">
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    className="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="inline-flex justify-center rounded-md bg-indigo-600 px-10 py-3 text-lg font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     Save
                 </button>

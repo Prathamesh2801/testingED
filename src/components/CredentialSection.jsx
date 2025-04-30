@@ -1,22 +1,19 @@
 import React, { useState } from 'react'
 import Credentials from './Credentials'
 import CreateNewCredentials from './CreateNewCredentials';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function CredentialSection() {
-    const [currentView, setCurrentView] = useState("display")
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const currentView = searchParams.get('view') || 'display';
+
+
     // Handle navigation between event views
-    const toggleEventView = () => {
-        if (currentView === "viewCredential") {
-            setCurrentView("display");
-            navigate(`/dashboard?tab=credentials`);
-        } else {
-            const newView = currentView === "display" ? "create" : "display";
-            setCurrentView(newView);
-            navigate(`/dashboard?tab=credentials&view=${newView}`);
-        }
-    }
+   const toggleEventView = () => {
+        const newView = currentView === 'display' ? 'create' : 'display';
+        navigate(`/dashboard?tab=credentials&view=${newView}`);
+    };
 
     return (
         <div>

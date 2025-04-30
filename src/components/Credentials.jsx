@@ -13,7 +13,7 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
-import { getAllCredentials } from '../utils/Credentials';
+import { deleteCredential, getAllCredentials } from '../utils/Credentials';
 
 export default function Credentials() {
   // State for credentials data
@@ -63,12 +63,8 @@ export default function Credentials() {
   // Handle deleting a credential
   const handleDeleteCredential = async (credentialId) => {
     try {
-      // Implement the delete API call here similar to deleteEvent
-      // await deleteCredential(credentialId);
-
-      // For now, just simulate deletion from the local state
-      setCredentials(credentials.filter(cred => cred.id !== credentialId));
-
+      await deleteCredential(credentialId);
+      fetchCredentials(); // Refresh the credentials list after deletion
       toast.success("Credential deleted successfully", {
         duration: 2000,
       });
@@ -117,7 +113,7 @@ export default function Credentials() {
         cell: (info) => (
           <div className="flex space-x-6">
             <button
-              onClick={() => handleDeleteCredential(info.row.original.id)}
+              onClick={() => handleDeleteCredential(info.row.original.Username)}
               className="text-red-600 hover:text-red-900"
             >
               <TrashIcon className="h-7 w-7" aria-hidden="true" />
