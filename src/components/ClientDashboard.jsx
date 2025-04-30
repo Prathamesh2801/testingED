@@ -294,7 +294,7 @@ export default function ClientDashboard() {
                     </div>
 
                     <main className="py-10 bg-gray-100">
-                        <div className="mx-auto min-h-fit px-4 sm:px-6 lg:px-8">
+                        <div className="mx-auto min-h-[80vh] px-4 sm:px-6 lg:px-8">
                             {/* Dynamic content based on active tab */}
                             {renderContent()}
                         </div>
