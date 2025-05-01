@@ -29,7 +29,7 @@ function App() {
         <Route path="/temp/:eventId" element={<EventRegistrationTemp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/clientLogin/:eventId" element={<ClientLogin />} />
-        <Route path="/noauth" element={<ErrorPage title="Access Denied" msg="Log through proper credentials" status={401}/>} />
+        <Route path="/noauth" element={<ErrorPage title="Access Denied" msg="Log through proper credentials" status={401} />} />
         <Route path="/clientDashboard" element={<ProtectedClientRoutes>
           <ClientDashboard />
         </ProtectedClientRoutes>} />

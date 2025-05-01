@@ -154,11 +154,11 @@ export default function ClientDataTable() {
     }
 
     // Handle Scanned column specifically
-    if (key === "Scanned" && (typeof value === "boolean" || value === "0" || value === "1")) {
+    if (key === "Scanned" || key === "WhatsApp_Status" || key === "Email_Status" || key === "Recognized" && (typeof value === "boolean" || value === "0" || value === "1")) {
       const boolValue = value === true || value === "1"
       return (
         <span
-          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${boolValue ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}
+          className={`inline-flex items-center rounded-full  px-2 py-1 text-xs font-medium ${boolValue ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
         >
           {boolValue ? "Yes" : "No"}
         </span>
@@ -183,6 +183,8 @@ export default function ClientDataTable() {
     if (!qrPath) return null
 
     return (
+
+
       <div className="fixed inset-0 bg-gray-600  bg-opacity-75 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
           <div className="flex justify-between items-center mb-4">
@@ -250,7 +252,10 @@ export default function ClientDataTable() {
   }
 
   return (
+    <>
+   
     <div className="bg-white shadow rounded-lg overflow-hidden">
+     
       {/* Search and controls */}
       <div className="p-4 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium leading-6 text-gray-900">User Records</h3>
@@ -263,7 +268,7 @@ export default function ClientDataTable() {
             </div>
             <input
               type="text"
-              className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full rounded-2xl border-0 py-1.5 pl-10 px-16 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset  sm:text-sm sm:leading-6"
               placeholder="Search records..."
               value={searchTerm}
               onChange={(e) => {
@@ -281,7 +286,7 @@ export default function ClientDataTable() {
             <select
               id="items-per-page"
               name="items-per-page"
-              className="rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset  sm:text-sm sm:leading-6"
               value={itemsPerPage}
               onChange={handleItemsPerPageChange}
             >
@@ -306,7 +311,7 @@ export default function ClientDataTable() {
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort(column)}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-1  font-bold text-gray-700" >
                     <span>{formatColumnHeader(column)}</span>
                     {sortColumn === column && (
                       <span className="inline-block">{sortDirection === "asc" ? "⬆️" : "⬇️"}</span>
@@ -345,9 +350,8 @@ export default function ClientDataTable() {
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-                }`}
+                className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+                  }`}
               >
                 <span className="sr-only">Previous</span>
                 <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
@@ -375,11 +379,10 @@ export default function ClientDataTable() {
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                      currentPage === pageNum
-                        ? "z-10 bg-indigo-600 text-white focus-visible:outline  focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
-                    }`}
+                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === pageNum
+                      ? "z-10 bg-[#36C95F] text-white focus-visible:outline  focus-visible:outline-offset-2 focus-visible:outline-[#36C95F]"
+                      : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+                      }`}
                   >
                     {pageNum}
                   </button>
@@ -389,9 +392,8 @@ export default function ClientDataTable() {
               <button
                 onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 ${
-                  currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-                }`}
+                className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+                  }`}
               >
                 <span className="sr-only">Next</span>
                 <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
@@ -405,9 +407,8 @@ export default function ClientDataTable() {
           <button
             onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className={`relative inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-              currentPage === 1 ? "text-gray-300 cursor-not-allowed" : "text-indigo-600 hover:bg-gray-50"
-            }`}
+            className={`relative inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${currentPage === 1 ? "text-gray-300 cursor-not-allowed" : "text-indigo-600 hover:bg-gray-50"
+              }`}
           >
             Previous
           </button>
@@ -417,9 +418,8 @@ export default function ClientDataTable() {
           <button
             onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className={`relative ml-3 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-              currentPage === totalPages ? "text-gray-300 cursor-not-allowed" : "text-indigo-600 hover:bg-gray-50"
-            }`}
+            className={`relative ml-3 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${currentPage === totalPages ? "text-gray-300 cursor-not-allowed" : "text-[#36C95F] hover:bg-gray-50"
+              }`}
           >
             Next
           </button>
@@ -429,5 +429,6 @@ export default function ClientDataTable() {
       {/* QR Code Modal */}
       {selectedQRCode && <QRCodeModal qrPath={selectedQRCode} onClose={() => setSelectedQRCode(null)} />}
     </div>
+</>
   )
 }

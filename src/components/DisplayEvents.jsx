@@ -79,7 +79,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
         header: "Event Name",
         accessorKey: "Event_Name",
         cell: (info) => (
-          <div className="flex items-center ">
+          <div className="flex items-center text-black ">
             <div className="h-10 w-10 rounded-full overflow-hidden">
               <img
                 className="h-10 w-10 rounded-full"
@@ -156,13 +156,13 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
               onClick={() => handleEventView(info.row.original.Event_ID)}
               className="text-indigo-600 hover:text-indigo-900"
             >
-              <EyeIcon className="h-7 w-7" aria-hidden="true" />
+              <EyeIcon className="h-5 w-5" aria-hidden="true" />
             </button>
             <button
               onClick={() => handleDeleteEvent(info.row.original.Event_ID)}
               className="text-red-600 hover:text-red-900"
             >
-              <TrashIcon className="h-7 w-7" aria-hidden="true" />
+              <TrashIcon className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         ),
@@ -247,7 +247,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="px-6 py-6 text-left  font-medium text-md text-gray-500 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-6 text-left  font-bold text-sm text-black  uppercase tracking-wider cursor-pointer"
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   <div className="flex items-center">

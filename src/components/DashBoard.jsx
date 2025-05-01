@@ -181,13 +181,13 @@ function DashBoard() {
                       className={classNames(
                         item.current
                           ? "bg-gray-50 text-indigo-600 bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)]"
-                          : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
+                          : "text-gray-700 hover:bg-gray-50 hover:text-[#3f703d]",
                         "group flex gap-x-3 rounded-md p-2 text-sm font-semibold",
                       )}
                     >
                       <item.icon
                         className={classNames(
-                          item.current ? "text-indigo-600" : "text-gray-400 group-hover:text-indigo-600",
+                          item.current ? "text-indigo-600" : "text-gray-400 group-hover:text-[#36C95F]",
                           "h-6 w-6 shrink-0",
                         )}
                       />
@@ -221,13 +221,13 @@ function DashBoard() {
                     className={classNames(
                       item.current
                         ? "text-white bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)] w-[225px] h-[40px] shrink-0 rounded-[0px_12px_70px_0px] "
-                        : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
+                        : "text-gray-700 hover:bg-gray-50 hover:text-[#36C95F]",
                       "group flex gap-x-3 p-2 text-sm font-semibold",
                     )}
                   >
                     <item.icon
                       className={classNames(
-                        item.current ? "text-white" : "text-black group-hover:text-indigo-600",
+                        item.current ? "text-white" : "text-black group-hover:text-[#36C95F]",
                         "h-6 w-6 shrink-0",
                       )}
                     />

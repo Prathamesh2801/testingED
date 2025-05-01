@@ -21,6 +21,7 @@ export default function ClientLogin() {
                 console.log("API Response:", response);
                 if (response && response.Data && response.Data.event) {
                     setLogo(response.Data.event.Event_Logo);
+                    localStorage.setItem('clientLogo', response.Data.event.Event_Logo);
                 } else {
                     console.error("Invalid response structure:", response);
                     setError(true);

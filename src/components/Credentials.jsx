@@ -116,7 +116,7 @@ export default function Credentials() {
               onClick={() => handleDeleteCredential(info.row.original.Username)}
               className="text-red-600 hover:text-red-900"
             >
-              <TrashIcon className="h-7 w-7" aria-hidden="true" />
+              <TrashIcon className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         ),
@@ -230,7 +230,7 @@ export default function Credentials() {
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="px-6 py-6 text-left font-medium text-md text-gray-500 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-6 text-left font-bold text-sm text-black uppercase tracking-wider cursor-pointer"
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   <div className="flex items-center">

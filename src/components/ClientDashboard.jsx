@@ -22,13 +22,18 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import ClientVisuals from './ClientVisuals'
 import ClientDataTable from './ClientDataTable'
+import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
+import ClientSection from './ClientSection'
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export default function ClientDashboard() {
+    const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [logo, setLogo] = useState(localStorage.getItem('clientLogo') || '')
 
     // Get the active tab from query parameter or default to 'dashboard'
     const getActiveTab = () => {
@@ -58,7 +63,7 @@ export default function ClientDashboard() {
 
     const userNavigation = [
         { name: 'Your profile', href: '#' },
-        { name: 'Sign out', href: '#' },
+        { name: 'Sign out', onClick: handleSignOut },
     ]
 
     // Update active tab when URL changes
@@ -67,6 +72,7 @@ export default function ClientDashboard() {
             setActiveTab(getActiveTab())
         }
 
+        setLogo(localStorage.getItem('clientLogo'))
         // Set up event listener for URL changes
         window.addEventListener('hashchange', handleLocationChange)
 
@@ -90,15 +96,25 @@ export default function ClientDashboard() {
         setSidebarOpen(false) // Close sidebar on mobile after click
     }
 
+    function handleSignOut() {
+        const eventId = localStorage.getItem('eventId')
+        localStorage.removeItem('token')
+        localStorage.removeItem('role')
+        localStorage.removeItem('eventId')
+        navigate(`/clientLogin/${eventId}`)
+    }
+
+
     // Render the appropriate component based on the active tab
+
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
                 return <ClientVisuals />
             case 'userdata':
-                return <ClientDataTable />
+                return <ClientSection/>
             default:
-                return <ClientVisuals /> // Default fallback
+                return <ClientVisuals />
         }
     }
 
@@ -128,8 +144,8 @@ export default function ClientDashboard() {
                             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
                                 <div className="flex h-16 shrink-0 items-center">
                                     <img
-                                        alt="Your Company"
-                                        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+                                        alt="Client Logo"
+                                        src={`${API_BASE_URL}/uploads/event_logos/${logo}`}
                                         className="h-8 w-auto"
                                     />
                                 </div>
@@ -144,16 +160,16 @@ export default function ClientDashboard() {
                                                             onClick={(e) => handleNavClick(e, item.name)}
                                                             className={classNames(
                                                                 item.current
-                                                                    ? 'bg-gray-50 text-indigo-600'
-                                                                    : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600',
-                                                                'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                                                                    ? 'bg-gray-50 text-white bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)]  w-[235px]  rounded-[0px_12px_70px_0px]'
+                                                                    : 'text-gray-700 hover:bg-gray-50 hover:text-[#36C95F]',
+                                                                'group flex gap-x-3  p-2 text-sm/6 font-semibold ',
                                                             )}
                                                         >
                                                             <item.icon
                                                                 aria-hidden="true"
                                                                 className={classNames(
-                                                                    item.current ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600',
-                                                                    'size-6 shrink-0',
+                                                                    item.current ? 'text-white' : 'text-gray-400 group-hover:text-[#36C95F]',
+                                                            'size-6 shrink-0',
                                                                 )}
                                                             />
                                                             {item.name}
@@ -170,7 +186,7 @@ export default function ClientDashboard() {
                                             >
                                                 <Cog6ToothIcon
                                                     aria-hidden="true"
-                                                    className="size-6 shrink-0 text-gray-400 group-hover:text-indigo-600"
+                                                    className="size-6 shrink-0 text-gray-400 group-hover:text-[#36C95F] "
                                                 />
                                                 Settings
                                             </a>
@@ -186,11 +202,11 @@ export default function ClientDashboard() {
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
                     {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white  px-6 pb-4">
-                        <div className="flex h-16 shrink-0 items-center">
+                        <div className="flex h-24 shrink-0 items-center">
                             <img
                                 alt="Your Company"
-                                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                                className="h-8 w-auto"
+                                src={`${API_BASE_URL}/uploads/event_logos/${logo}`}
+                                className="h-18 w-18 rounded-full"
                             />
                         </div>
                         <nav className="flex flex-1 flex-col">
@@ -204,15 +220,15 @@ export default function ClientDashboard() {
                                                     onClick={(e) => handleNavClick(e, item.name)}
                                                     className={classNames(
                                                         item.current
-                                                            ? 'bg-gray-50 text-indigo-600'
-                                                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600',
-                                                        'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                                                            ? 'bg-gray-50 text-white bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)]  w-[235px]  rounded-[0px_12px_70px_0px]'
+                                                            : 'text-gray-700 hover:bg-gray-50 hover:text-[#36C95F]',
+                                                        'group flex gap-x-3  p-2 text-sm/6 font-semibold ',
                                                     )}
                                                 >
                                                     <item.icon
                                                         aria-hidden="true"
                                                         className={classNames(
-                                                            item.current ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600',
+                                                            item.current ? 'text-white' : 'text-gray-400 group-hover:text-[#36C95F]',
                                                             'size-6 shrink-0',
                                                         )}
                                                     />
@@ -241,7 +257,7 @@ export default function ClientDashboard() {
                 </div>
 
                 <div className="lg:pl-72">
-                    <div className="sticky top-0 z-40 lg:mx-auto lg:max-w-7xl lg:px-8">
+                    <div className="sticky top-0 z-40 ">
                         <div className="flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-0 lg:shadow-none">
                             <button
                                 type="button"
@@ -262,7 +278,7 @@ export default function ClientDashboard() {
 
                                     {/* Profile dropdown */}
                                     <Menu as="div" className="relative">
-                                        <MenuButton className=" flex items-center p-1.5">
+                                        <MenuButton className=" flex items-center p-1.5 px-16">
                                             <span className="sr-only">Open user menu</span>
                                             <span className="hidden lg:flex lg:items-center">
                                                 <UserCircleIcon className='w-7 h-auto' />
@@ -277,16 +293,20 @@ export default function ClientDashboard() {
                                             className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                                         >
                                             {userNavigation.map((item) => (
-                                                <MenuItem key={item.name}>
-                                                    <a
-                                                        href={item.href}
-                                                        className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
-                                                    >
-                                                        {item.name}
-                                                    </a>
+                                                <MenuItem
+                                                    key={item.name}
+                                                    as={item.onClick ? 'button' : 'a'}
+                                                    {...(item.onClick
+                                                        ? { onClick: item.onClick, type: 'button' }
+                                                        : { href: item.href }
+                                                    )}
+                                                    className="block w-full text-left px-3 py-1 text-sm text-gray-900 hover:bg-gray-50"
+                                                >
+                                                    {item.name}
                                                 </MenuItem>
                                             ))}
                                         </MenuItems>
+
                                     </Menu>
                                 </div>
                             </div>
@@ -294,7 +314,7 @@ export default function ClientDashboard() {
                     </div>
 
                     <main className="py-10 bg-gray-100">
-                        <div className="mx-auto min-h-[80vh] px-4 sm:px-6 lg:px-8">
+                        <div className="mx-auto min-h-[80vh] px-4 sm:px-6 lg:px-14">
                             {/* Dynamic content based on active tab */}
                             {renderContent()}
                         </div>
