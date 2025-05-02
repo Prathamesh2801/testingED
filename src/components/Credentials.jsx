@@ -252,7 +252,7 @@ export default function Credentials() {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
+            <tr key={row.id} className={row.id % 2 === 0 ? "bg-white" : "bg-gray-50"}>
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -13,10 +13,11 @@ import { rankItem } from "@tanstack/match-sorter-utils"
 import { API_BASE_URL } from "../config"
 import { deleteEvent, getEventById } from "../utils/EventFetchApi"
 import { toast } from 'react-hot-toast'
-import { TrashIcon, EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
+import { TrashIcon, EyeIcon, ChevronDownIcon, ChevronUpIcon,ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
+import { useNavigate } from "react-router-dom"
 
 export default function DisplayEvents({ events = [], loading, error, pagination, onPageChange, onRefresh, onEventView }) {
-
+  // const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -72,6 +73,9 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
     }
   };
 
+  // function handleRedirectEvent(eventId){
+  //   navigate(`/clientDashboard`)
+  // }
 
   const columns = useMemo(
     () => [
@@ -164,6 +168,12 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
             >
               <TrashIcon className="h-5 w-5" aria-hidden="true" />
             </button>
+            <button
+              onClick={() => handleRedirectEvent(info.row.original.Event_ID)}
+              className="text-shadow-emerald-600 hover:text-shadow-emerald-900"
+            >
+              <ArrowTopRightOnSquareIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
         ),
       },
@@ -243,7 +253,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
       <table className="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
         <thead className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <tr key={headerGroup.id} >
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
@@ -269,7 +279,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
+            <tr key={row.id} className={row.id % 2 === 0 ? "bg-white" : "bg-gray-50"} >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

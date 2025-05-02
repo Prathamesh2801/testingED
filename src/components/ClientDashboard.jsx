@@ -21,7 +21,6 @@ import {
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import ClientVisuals from './ClientVisuals'
-import ClientDataTable from './ClientDataTable'
 import { useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../config'
 import ClientSection from './ClientSection'
