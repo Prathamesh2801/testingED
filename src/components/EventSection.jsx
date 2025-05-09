@@ -5,7 +5,8 @@ import CreateNewEvent from "./CreateNewEvent"
 import ViewEvent from "./ViewEvent"
 import { useState, useEffect } from "react"
 
-export default function EventSection({ events, loading, error, pagination, handlePageChange, setEvents, onRefresh }) {
+
+export default function EventSection({ events, loading, error, pagination, handlePageChange, onRefresh }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [currentView, setCurrentView] = useState("display")
@@ -18,8 +19,7 @@ export default function EventSection({ events, loading, error, pagination, handl
 
   // Set the view based on URL parameters on initial load and when they change
   useEffect(() => {
-    console.log("URL params changed:", { viewParam, eventIdParam })
-
+   
     if (viewParam) {
       setCurrentView(viewParam)
     }
@@ -28,6 +28,7 @@ export default function EventSection({ events, loading, error, pagination, handl
       setViewEventId(eventIdParam)
     }
   }, [location.search, viewParam, eventIdParam])
+
 
   // Handle view event 
   const handleEventView = (eventId) => {
@@ -60,7 +61,7 @@ export default function EventSection({ events, loading, error, pagination, handl
           <button
             type="button"
             onClick={toggleEventView}
-            className="inline-flex items-center rounded-2xl bg-emerald-700 px-3 py-2 text-md font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="inline-flex items-center rounded-2xl bg-emerald-700 px-3 py-2 text-md font-semibold text-white shadow-xs hover:bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             {currentView === "display" ? "Create New Event" : 
              currentView === "viewEvent" ? "Back to Events" : "Display All Events"}

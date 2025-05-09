@@ -222,46 +222,47 @@ export default function Credentials() {
           className="border px-6 py-2 rounded-2xl w-1/4 bg-white text-gray-900"
         />
       </div>
-
-      <table className="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
-        <thead className="bg-gray-50">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="px-6 py-6 text-left font-bold text-sm text-black uppercase tracking-wider cursor-pointer"
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  <div className="flex items-center">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {{
-                      asc: <ChevronUpIcon
-                        aria-hidden="true"
-                        className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
-                      />, desc: <ChevronDownIcon
-                        aria-hidden="true"
-                        className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
-                      />
-                    }[header.column.getIsSorted()] ?? null}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className={row.id % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className='overflow-x-auto'>
+        <table className="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
+          <thead className="bg-gray-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-6 py-6 text-left font-bold text-sm text-black uppercase tracking-wider cursor-pointer"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <div className="flex items-center">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{
+                        asc: <ChevronUpIcon
+                          aria-hidden="true"
+                          className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
+                        />, desc: <ChevronDownIcon
+                          aria-hidden="true"
+                          className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
+                        />
+                      }[header.column.getIsSorted()] ?? null}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className={row.id % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination buttons at the bottom */}
       <div className="flex justify-between items-center mt-4">

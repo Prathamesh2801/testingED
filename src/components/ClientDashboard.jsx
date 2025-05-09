@@ -12,6 +12,7 @@ import {
     TransitionChild,
 } from '@headlessui/react'
 import {
+    ArrowUturnLeftIcon,
     Bars3Icon,
     ChartPieIcon,
     Cog6ToothIcon,
@@ -21,7 +22,7 @@ import {
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import ClientVisuals from './ClientVisuals'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../config'
 import ClientSection from './ClientSection'
 
@@ -105,13 +106,12 @@ export default function ClientDashboard() {
 
 
     // Render the appropriate component based on the active tab
-
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
                 return <ClientVisuals />
             case 'userdata':
-                return <ClientSection/>
+                return <ClientSection />
             default:
                 return <ClientVisuals />
         }
@@ -168,7 +168,7 @@ export default function ClientDashboard() {
                                                                 aria-hidden="true"
                                                                 className={classNames(
                                                                     item.current ? 'text-white' : 'text-gray-400 group-hover:text-[#36C95F]',
-                                                            'size-6 shrink-0',
+                                                                    'size-6 shrink-0',
                                                                 )}
                                                             />
                                                             {item.name}
@@ -177,6 +177,23 @@ export default function ClientDashboard() {
                                                 ))}
                                             </ul>
                                         </li>
+
+                                        {/* Add Back to Admin button in the mobile sidebar if admin */}
+                                        {localStorage.getItem('role') === "Admin" && (
+                                            <li className="mt-2">
+                                                <Link
+                                                    to='/dashboard'
+                                                    className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#36C95F]"
+                                                    onClick={() => setSidebarOpen(false)}
+                                                >
+                                                    <ArrowUturnLeftIcon
+                                                        aria-hidden="true"
+                                                        className="size-6 shrink-0 text-gray-400 group-hover:text-[#36C95F]"
+                                                    />
+                                                    Back to Admin
+                                                </Link>
+                                            </li>
+                                        )}
 
                                         <li className="mt-auto">
                                             <a
@@ -189,6 +206,20 @@ export default function ClientDashboard() {
                                                 />
                                                 Settings
                                             </a>
+                                        </li>
+                                        
+                                        {/* Add Sign Out option directly in the mobile sidebar */}
+                                        <li>
+                                            <button
+                                                onClick={handleSignOut}
+                                                className="group -mx-2 flex w-full gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#36C95F]"
+                                            >
+                                                <XMarkIcon
+                                                    aria-hidden="true"
+                                                    className="size-6 shrink-0 text-gray-400 group-hover:text-[#36C95F]"
+                                                />
+                                                Sign Out
+                                            </button>
                                         </li>
                                     </ul>
                                 </nav>
@@ -267,9 +298,23 @@ export default function ClientDashboard() {
                                 <Bars3Icon aria-hidden="true" className="size-6" />
                             </button>
 
+                            {/* Back to Admin button - visible only on desktop */}
+                            <div className="hidden lg:block">
+                                {localStorage.getItem('role') === "Admin" && (
+                                    <Link
+                                        to='/dashboard'
+                                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-[#36C95F] transition-colors duration-200 ease-in-out rounded-md hover:bg-gray-50"
+                                    >
+                                        <ArrowUturnLeftIcon className='h-5 w-5' />
+                                        <span>Back to Admin</span>
+                                    </Link>
+                                )}
+                            </div>
+                            
                             {/* Separator */}
                             <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
 
+                            {/* Redirect to Super Admin Dashboard  */}
                             <div className="flex flex-1 justify-end gap-x-4 self-stretch lg:gap-x-6">
                                 <div className="flex items-center gap-x-4 lg:gap-x-6">
                                     {/* Separator */}
@@ -277,14 +322,14 @@ export default function ClientDashboard() {
 
                                     {/* Profile dropdown */}
                                     <Menu as="div" className="relative">
-                                        <MenuButton className=" flex items-center p-1.5 px-16">
+                                        <MenuButton className="flex items-center p-1.5 lg:px-8">
                                             <span className="sr-only">Open user menu</span>
-                                            <span className="hidden lg:flex lg:items-center">
+                                            <span className="flex items-center">
                                                 <UserCircleIcon className='w-7 h-auto' />
-                                                <span aria-hidden="true" className="ml-4 text-sm/6 font-semibold text-gray-900">
+                                                <span aria-hidden="true" className="ml-2 text-sm/6 font-semibold text-gray-900">
                                                     Profile
                                                 </span>
-                                                <ChevronDownIcon aria-hidden="true" className="ml-2 size-5 text-gray-400" />
+                                                <ChevronDownIcon aria-hidden="true" className="ml-1 size-5 text-gray-400" />
                                             </span>
                                         </MenuButton>
                                         <MenuItems
@@ -305,7 +350,6 @@ export default function ClientDashboard() {
                                                 </MenuItem>
                                             ))}
                                         </MenuItems>
-
                                     </Menu>
                                 </div>
                             </div>

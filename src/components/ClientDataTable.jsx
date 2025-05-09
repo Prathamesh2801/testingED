@@ -7,33 +7,32 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid"
 import { API_BASE_URL } from "../config"
 import { TrashIcon } from "@heroicons/react/24/outline"
 import { PencilSquareIcon } from "@heroicons/react/24/outline"
-
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
+import { SiWhatsapp } from "@icons-pack/react-simple-icons"
+import GmailIcon from "../assets/img/icons8-gmail-48.png"
+import { fetchEvents } from "../utils/EventFetchApi"
 
 
-export default function ClientDataTable() {
+export default function ClientDataTable({onRefresh}) {
   const navigate = useNavigate();
+  const eventId = localStorage.getItem("eventId")
+  const [eventData, setEventData] = useState(null)
   const [userData, setUserData] = useState([])
   const [columns, setColumns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
-
- 
   const [selectedQRCode, setSelectedQRCode] = useState(null)
-
   const [sortColumn, setSortColumn] = useState(null)
   const [sortDirection, setSortDirection] = useState("asc")
 
   const fetchClientData = async () => {
     try {
       setLoading(true)
-      const response = await getUserDataByClient()
+      const response = await getUserDataByClient(localStorage.getItem("eventId") || "")
       console.log("Client Data:", response)
 
       if (response) {
@@ -62,7 +61,24 @@ export default function ClientDataTable() {
 
   useEffect(() => {
     fetchClientData()
-  }, [])
+  }, [onRefresh])
+
+  // For Whatsapp and Email buttons redering 
+  useEffect(() => {
+    if (!eventId) return
+
+    async function loadEventData() {
+      try {
+        const data = await fetchEvents(eventId)
+        console.log("Event Data:", data)
+        setEventData(data.Data.event)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    loadEventData()
+  }, [eventId])
 
   async function handleDelete(userID) {
     toast.promise(
@@ -74,13 +90,13 @@ export default function ClientDataTable() {
       }
     )
   }
-  
-   function handleEdit(userID) {
-      // include the id so the form can load existing values
-       navigate(`/clientDashboard?view=create&userId=${encodeURIComponent(userID)}`)
-     }
 
-     
+  function handleEdit(userID) {
+    // include the id so the form can load existing values
+    navigate(`/clientDashboard?view=create&userId=${encodeURIComponent(userID)}`)
+  }
+
+
   // Fuzzy search function
   const fuzzySearch = (item, term) => {
     if (!term || term === "") return true
@@ -203,6 +219,7 @@ export default function ClientDataTable() {
 
   // QR Code Modal
   const QRCodeModal = ({ qrPath, onClose }) => {
+    console.log("QR Path:", qrPath)
     if (!qrPath) return null
 
     return (
@@ -219,13 +236,9 @@ export default function ClientDataTable() {
           </div>
           <div className="flex justify-center">
             <img
-              src={`${API_BASE_URL}/uploads/event_logos/${qrPath}`}
+              src={`${API_BASE_URL}/${qrPath}`}
               alt="QR Code"
               className="max-w-full h-auto"
-              onError={(e) => {
-                e.target.onerror = null
-                e.target.src = "https://via.placeholder.com/150?text=QR+Not+Found"
-              }}
             />
           </div>
           <div className="mt-4 flex justify-end">
@@ -389,6 +402,21 @@ export default function ClientDataTable() {
                 <span className="font-medium">{filteredData.length}</span> results
               </p>
             </div>
+            <div className="ml-auto mr-5 flex items-center space-x-4">
+              {eventData?.Event_WhatsApp_Column_Name && eventData?.Event_WhatsApp_Template_ID && <button
+                className="flex items-center gap-2 p-2 pr-4 text-sm font-medium text-green-600  bg-transparent hover:bg-green-100 cursor-pointer border border-green-600 transition-colors duration-200 ease-in-out rounded-full hover:border-none "
+              > <SiWhatsapp className="w-6 h-6 text-green-500 ml-4" />
+                <span>Send WhatsApp</span>
+              </button>}
+
+              {eventData?.IsEmail === "1" && <button
+                className="flex items-center gap-2 p-2  pr-4  text-sm font-medium text-red-600  bg-transparent hover:bg-red-100 cursor-pointer border border-red-600 transition-colors duration-200 ease-in-out rounded-full hover:border-none "
+              > 
+             
+                <img src={GmailIcon} alt="" className="w-6 h-6" />
+                <span>Send E-Mail</span>
+              </button>}
+            </div>
             <div>
               <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                 <button
@@ -447,6 +475,8 @@ export default function ClientDataTable() {
           </div>
 
           {/* Mobile pagination */}
+
+            <div className="flex flex-col items-between justify-between">
           <div className="flex sm:hidden items-center justify-between w-full">
             <button
               onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
@@ -468,6 +498,24 @@ export default function ClientDataTable() {
               Next
             </button>
           </div>
+          
+          
+           <div className="mx-auto mr-5 flex items-center space-x-4 sm:hidden">
+              {eventData?.Event_WhatsApp_Column_Name && eventData?.Event_WhatsApp_Template_ID && <button
+                className="flex items-center gap-2 p-2 pr-4 text-sm font-medium text-green-600  bg-transparent hover:bg-green-100 cursor-pointer border border-green-600 transition-colors duration-200 ease-in-out rounded-full hover:border-none "
+              > <SiWhatsapp className="w-6 h-6 text-green-500 ml-4" />
+                <span>Send WhatsApp</span>
+              </button>}
+
+              {eventData?.IsEmail === "1" && <button
+                className="flex items-center gap-2 p-2  pr-4  text-sm font-medium text-red-600  bg-transparent hover:bg-red-100 cursor-pointer border border-red-600 transition-colors duration-200 ease-in-out rounded-full hover:border-none "
+              > 
+             
+                <img src={GmailIcon} alt="" className="w-6 h-6" />
+                <span>Send E-Mail</span>
+              </button>}
+            </div>
+            </div>
         </div>
 
         {/* QR Code Modal */}

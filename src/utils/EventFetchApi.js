@@ -19,52 +19,45 @@ export const fetchEvents = async (eventId) => {
     }
 };
 
-export const registerEvent = async (eventId, formData) => {
-    try {
-        const formDataObj = new FormData();
-
-        // Add Event_ID
-        formDataObj.append('Event_ID', eventId);
-
-        // Add all form fields with proper formatting
-        Object.keys(formData).forEach(key => {
-            const value = formData[key];
-
-            // Handle file objects differently
-            if (value instanceof File) {
-                formDataObj.append(key, value);
-            } else if (typeof value === 'number') {
-                formDataObj.append(key, value.toString());
-            } else if (value) { // Only append if value exists
-                formDataObj.append(key, value);
-            }
-        });
-
-        // Debug log
-        for (let pair of formDataObj.entries()) {
-            console.log('Sending:', pair[0], typeof pair[1] === 'object' ? 'File' : pair[1]);
-        }
-
-        const response = await axios.post(
-            `${API_BASE_URL}/register.php`,
-            formDataObj,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-
-        if (response.data.Status) {
-            return response.data;
-        } else {
-            throw new Error(response.data.Message || 'Registration failed');
-        }
-    } catch (error) {
-        console.error('Server Error:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.Message || error.message || 'Registration failed');
+export const registerEvent = async (eventId, dataAndFiles) => {
+    const formDataObj = new FormData()
+  
+    // Make sure Event_ID is always set and logged
+    const eventIdToUse = eventId || localStorage.getItem("eventId") 
+    if (!eventIdToUse) {
+      console.error("No Event_ID available in localStorage or parameters")
+      throw new Error("Event_ID is required")
     }
-};
+  
+    formDataObj.append("Event_ID", eventIdToUse)
+    console.log("Using Event_ID:", eventIdToUse) // Debug log
+  
+    Object.entries(dataAndFiles).forEach(([key, value]) => {
+      if (value instanceof File) {
+        formDataObj.append(key, value)
+      } else if (typeof value === "number") {
+        formDataObj.append(key, value.toString())
+      } else if (value != null && value !== "") {
+        formDataObj.append(key, value)
+      }
+    })
+  
+    // Debug: list out everything you're about to send
+    for (const [k, v] of formDataObj.entries()) {
+      console.log(k, v instanceof File ? `FILE(${v.name})` : v)
+    }
+  
+    const resp = await axios.post(`${API_BASE_URL}/register.php`, formDataObj,{
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'multipart/form-data',
+        }
+    })
+  
+    if (resp.data.Status) return resp.data
+    throw new Error(resp.data.Message || "Registration failed")
+  }
+  
 
 
 

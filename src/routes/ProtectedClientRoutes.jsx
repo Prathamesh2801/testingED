@@ -2,9 +2,8 @@ import { Navigate } from "react-router-dom";
 
 export function ProtectedClientRoutes({ children }) {
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-    
-    if (!token || role !== 'Client') {
+ 
+    if (!token ) {
         return <Navigate to="/noauth" />;
     }
     

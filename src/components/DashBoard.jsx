@@ -1,14 +1,17 @@
 "use client"
 
+import Logo from "../assets/img/logo.png"
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { getAllEvents } from "../utils/EventFetchApi"
-import Logo from "../assets/img/logo.png"
-
-// import DashboardIcon from '../assets/img/dashboardIcon.png'
-import { Bars3Icon, IdentificationIcon, UsersIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { 
+  Bars3Icon, 
+  IdentificationIcon, 
+  UsersIcon, 
+  XMarkIcon,
+  ArrowRightOnRectangleIcon  // Added sign-out icon
+} from "@heroicons/react/24/outline"
 import EventSection from "./EventSection"
-import Credentials from "./Credentials"
 import CredentialSection from "./CredentialSection"
 
 function classNames(...classes) {
@@ -43,6 +46,14 @@ function DashBoard() {
       current: activeTab === "credentials",
     },
   ]
+
+  // Handle sign out
+  const handleSignOut = () => {
+    // Clear any local storage or authentication tokens
+    localStorage.clear()
+    // Redirect to login page
+    navigate("/login")
+  }
 
   // Also check for refreshed=true parameter
   useEffect(() => {
@@ -85,6 +96,8 @@ function DashBoard() {
     }
   }, [pagination.page, pagination.limit])
 
+
+
   const handlePageChange = (newPage, newLimit) => {
     // Update pagination state which will trigger a re-fetch via useEffect
     setPagination((prev) => ({
@@ -104,6 +117,9 @@ function DashBoard() {
     } else {
       navigate(`/dashboard?tab=${tab.toLowerCase()}`)
     }
+  
+      setSidebarOpen(false)
+
   }
 
   // Add event refresh handler
@@ -158,7 +174,7 @@ function DashBoard() {
         <div className="flex h-16 shrink-0 items-center px-6">
           <img
             alt="Company Logo"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+            src={Logo}
             className="h-8 w-auto"
           />
           <button
@@ -180,14 +196,14 @@ function DashBoard() {
                       onClick={(e) => handleNavClick(e, item.name)}
                       className={classNames(
                         item.current
-                          ? "bg-gray-50 text-indigo-600 bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)]"
+                          ? "bg-gray-50 text-white  bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)] w-[225px] h-[40px] shrink-0 rounded-[0px_12px_70px_0px]"
                           : "text-gray-700 hover:bg-gray-50 hover:text-[#3f703d]",
-                        "group flex gap-x-3 rounded-md p-2 text-sm font-semibold",
+                        "group flex gap-x-3  p-2 text-sm font-semibold",
                       )}
                     >
                       <item.icon
                         className={classNames(
-                          item.current ? "text-indigo-600" : "text-gray-400 group-hover:text-[#36C95F]",
+                          item.current ? "text-white" : "text-gray-400 group-hover:text-[#36C95F]",
                           "h-6 w-6 shrink-0",
                         )}
                       />
@@ -196,6 +212,16 @@ function DashBoard() {
                   </li>
                 ))}
               </ul>
+            </li>
+            {/* Sign out button for mobile */}
+            <li className="mt-auto">
+              <button
+                onClick={handleSignOut}
+                className="group flex w-full items-center gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-red-600"
+              >
+                <ArrowRightOnRectangleIcon className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-red-600" />
+                Sign Out
+              </button>
             </li>
           </ul>
         </nav>
@@ -211,8 +237,8 @@ function DashBoard() {
               className="h-14 w-auto"
             />
           </div>
-          <nav className="flex flex-1 flex-col  ">
-            <ul role="list" className="-mx-2 space-y-1 ">
+          <nav className="flex flex-1 flex-col">
+            <ul role="list" className="-mx-2 space-y-1">
               {navigation.map((item) => (
                 <li key={item.name}>
                   <a
@@ -235,6 +261,17 @@ function DashBoard() {
                   </a>
                 </li>
               ))}
+              
+              {/* Sign out button for desktop - positioned at bottom */}
+              <li className="mt-auto absolute bottom-10 w-[225px]">
+                <button
+                  onClick={handleSignOut}
+                  className="group flex items-center gap-x-3 p-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-red-600 w-full"
+                >
+                  <ArrowRightOnRectangleIcon className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-red-600" />
+                  Sign Out
+                </button>
+              </li>
             </ul>
           </nav>
         </div>
@@ -247,19 +284,29 @@ function DashBoard() {
           <Bars3Icon className="h-6 w-6" />
         </button>
         <div className="flex-1 text-sm font-semibold text-gray-900">Dashboard</div>
-        <a href="#">
-          <span className="sr-only">Your profile</span>
-          <img
-            alt="Profile"
-            src="https://www.zealinteractive.in/wp-content/uploads/2024/10/Zeal-interactive-Logo.png"
-            className="h-8 w-8 rounded-full bg-gray-50"
-          />
-        </a>
+        <div className="flex items-center space-x-2">
+          {/* Sign out button in mobile header */}
+          <button
+            onClick={handleSignOut}
+            className="rounded-full bg-white p-2 text-gray-500 hover:text-red-600"
+          >
+            <ArrowRightOnRectangleIcon className="h-6 w-6" />
+            <span className="sr-only">Sign out</span>
+          </button>
+          <a href="#">
+            <span className="sr-only">Your profile</span>
+            <img
+              alt="Profile"
+              src="https://www.zealinteractive.in/wp-content/uploads/2024/10/Zeal-interactive-Logo.png"
+              className="h-8 w-8 rounded-full bg-gray-50"
+            />
+          </a>
+        </div>
       </div>
 
       {/* Main content */}
       <main className="lg:pl-64">
-        <div className="p-6  bg-gray-200 min-h-screen">
+        <div className="p-6 bg-gray-200 min-h-screen">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
               {activeTab === "events" ? "Events" : activeTab === "credentials" ? "Client Credentials" : "Dashboard"}

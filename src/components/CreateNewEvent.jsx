@@ -92,8 +92,8 @@ function CreateNewEvent({onRefresh}) {
     }
 
     return (
-        <div className="p-6">
-            <ol className="flex items-center w-full text-sm text-gray-500 font-medium sm:text-base mb-12">
+        <div className="md:p-6">
+            <ol className="flex flex-col-2  gap-1 sm:flex-row flex-wrap sm:flex-nowrap px-4 sm:px-0 items-start sm:items-center w-full text-sm sm:text-base text-gray-500 font-medium mb-12">
                 <li className={`flex md:w-full items-center ${currentStep === 1 ? 'text-indigo-600' : 'text-gray-600'} sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8`}>
                     <div className="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2">
                         <span className={`w-6 h-6 ${currentStep === 1 ? 'bg-indigo-600' : currentStep > 1 ? 'bg-green-500' : 'bg-gray-100'} border border-gray-200 rounded-full flex justify-center items-center mr-3 text-sm ${currentStep === 1 ? 'text-white' : currentStep > 1 ? 'text-white' : 'text-gray-600'} lg:w-10 lg:h-10`}>

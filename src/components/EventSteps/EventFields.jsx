@@ -123,8 +123,8 @@ function EventFields({ onSubmit, onPrevious, initialData = [] }) {
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleEnumModalSubmit}
             />
-            <form onSubmit={handleSubmit}>
-                <div className="mb-6">
+            <form onSubmit={handleSubmit} >
+                <div className="mb-6 ">
                     {/* Changed div to add flex and justify-end */}
                     <div className="flex justify-end mb-4">
                         <button
@@ -135,11 +135,11 @@ function EventFields({ onSubmit, onPrevious, initialData = [] }) {
                             Add Field
                         </button>
                     </div>
-
+                    
                     {/* Rest of your existing code */}
                     {fields.map((field, index) => (
-                        <div key={index} className="mb-4 p-4 border rounded-lg">
-                            <div className="grid grid-cols-4 gap-8">
+                        <div key={index} className="mb-4 p-4 border rounded-lg ">
+                            <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4  gap-1 md:gap-8">
                                 <div>
                                     <label className="block mb-2 text-sm font-medium text-gray-600">
                                         Field Name

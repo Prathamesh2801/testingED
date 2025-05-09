@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -11,43 +11,17 @@ import {
 } from "@tanstack/react-table"
 import { rankItem } from "@tanstack/match-sorter-utils"
 import { API_BASE_URL } from "../config"
-import { deleteEvent, getEventById } from "../utils/EventFetchApi"
+import { deleteEvent, fetchEvents } from "../utils/EventFetchApi"
 import { toast } from 'react-hot-toast'
-import { TrashIcon, EyeIcon, ChevronDownIcon, ChevronUpIcon,ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
+import { TrashIcon, EyeIcon, ChevronDownIcon, ChevronUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import { useNavigate } from "react-router-dom"
 
 export default function DisplayEvents({ events = [], loading, error, pagination, onPageChange, onRefresh, onEventView }) {
-  // const navigate = useNavigate();
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-      </div>
-    )
-  }
+  const navigate = useNavigate()
+  const [globalFilter, setGlobalFilter] = useState("")
 
-  if (error) {
-    return (
-      <div className="rounded-md bg-red-50 p-4 mb-4">
-        <div className="flex">
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading events</h3>
-            <div className="mt-2 text-sm text-red-700">{error}</div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!events || events.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No events found</h3>
-        <p className="mt-1 text-sm text-gray-500">Create a new event to get started.</p>
-      </div>
-    )
-  }
+ 
 
   const handleDeleteEvent = async (eventId) => {
 
@@ -73,15 +47,19 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
     }
   };
 
-  // function handleRedirectEvent(eventId){
-  //   navigate(`/clientDashboard`)
-  // }
+  async function handleRedirectEvent(eventId) {
+    const response = await fetchEvents(eventId);
+    localStorage.setItem('clientLogo', response.Data.event.Event_Logo);
+    localStorage.setItem('eventId', eventId);
+    navigate(`/clientDashboard`)
+  }
 
   const columns = useMemo(
     () => [
       {
         header: "Event Name",
         accessorKey: "Event_Name",
+
         cell: (info) => (
           <div className="flex items-center text-black ">
             <div className="h-10 w-10 rounded-full overflow-hidden">
@@ -182,7 +160,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
     [],
   )
 
-  const [globalFilter, setGlobalFilter] = useState("")
+
 
   const fuzzyFilterFn = (row, columnId, value) => {
     return rankItem(row.getValue(columnId), value).passed
@@ -212,6 +190,50 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
     manualPagination: true,
     pageCount: pagination ? pagination.total_pages : undefined,
   })
+
+  // ➊ Redirect on 401
+  useEffect(() => {
+    if (error?.status === 401) {
+      // Optionally clear tokens here…
+      
+      toast.error("Session expired. Please log in again. Refresh the Page", {
+        duration: 2000,
+      })
+    }
+  }, [error, navigate])
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-md bg-red-50 p-4 mb-4">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">Error loading events</h3>
+            <div className="mt-2 text-sm text-red-700">{error}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+ 
+
+  if (!events || events.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <h3 className="mt-2 text-sm font-medium text-gray-900">No events found</h3>
+        <p className="mt-1 text-sm text-gray-500">Create a new event to get started.</p>
+      </div>
+    )
+  }
+
+
 
   return (
     <div className="p-4 bg-gray-200 rounded-lg shadow-md">
@@ -249,47 +271,47 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
           className="border px-6  py-2 rounded-2xl w-1/4 bg-white text-gray-900 "
         />
       </div>
-
-      <table className="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
-        <thead className="bg-gray-50">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} >
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="px-6 py-6 text-left  font-bold text-sm text-black  uppercase tracking-wider cursor-pointer"
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  <div className="flex items-center">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {{
-                      asc: <ChevronUpIcon
-                        aria-hidden="true"
-                        className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
-                      />, desc: <ChevronDownIcon
-                        aria-hidden="true"
-                        className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
-                      />
-                    }[header.column.getIsSorted()] ?? null}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className={row.id % 2 === 0 ? "bg-white" : "bg-gray-50"} >
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 rounded-2xl overflow-hidden">
+          <thead className="bg-gray-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} >
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-6 py-6 text-left  font-bold text-sm text-black  uppercase tracking-wider cursor-pointer"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <div className="flex items-center">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{
+                        asc: <ChevronUpIcon
+                          aria-hidden="true"
+                          className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
+                        />, desc: <ChevronDownIcon
+                          aria-hidden="true"
+                          className="pointer-events-none col-start-1 row-start-1 ml-2 size-5 self-center justify-self-end text-gray-500 sm:size-6"
+                        />
+                      }[header.column.getIsSorted()] ?? null}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className={row.id % 2 === 0 ? "bg-white" : "bg-gray-50"} >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 ">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {/* Pagination buttons at the bottom */}
       <div className="flex justify-between items-center mt-4">
         <button
@@ -300,7 +322,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
           Previous
         </button>
         <span className="text-sm text-gray-700">
-          Showing page {pagination.page} of {pagination.total_pages}
+           page {pagination.page} of {pagination.total_pages}
         </span>
         <button
           onClick={() => onPageChange?.(pagination.page + 1)}

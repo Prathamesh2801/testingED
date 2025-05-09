@@ -3,30 +3,7 @@ import { API_BASE_URL } from '../config';
 
 
 
-export async function getUserDataByEventID(eventID) {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/Client/user.php`,
-      {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        params: {
-          Event_ID: eventID,
-        }
-      }
-    );
-    if (response.data?.Status !== true) {
-      throw new Error("Server returned an error status");
-    }
 
-    return response.data.Data;
-
-  } catch (err) {
-    console.error("Failed to fetch user data by Event_ID:", err);
-    throw err;
-  }
-}
 
 export async function getUserDataByClient() {
   try {
@@ -35,8 +12,12 @@ export async function getUserDataByClient() {
       {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
+        },
+        params: {
+          Event_ID: localStorage.getItem('eventId') || null,
+        },
       }
+      
     );
     if (response.data?.Status !== true) {
       throw new Error("Server returned an error status");
@@ -62,6 +43,7 @@ export async function deleteUserDataClient(userID) {
         },
         data: {
           User_ID: userID,
+          Event_ID: localStorage.getItem('eventId') || null,
         }
       }
     );
@@ -111,17 +93,49 @@ export async function getSpecificUserData(userID) {
       },
       params: {
         User_ID: userID,
+        Event_ID: localStorage.getItem('eventId'),
       },
     });
 
     if (response.data?.Status !== true) {
       throw new Error(response.data?.Message || "Server returned an error status");
     }
-
     return response.data.Data;
-
   } catch (err) {
     console.error("Failed to fetch specific user data:", err);
     throw err;
   }
 }
+
+
+
+
+export async function uploadEventExcel({ eventID, excelFile }) {
+  // eventID: string or number
+  // excelFile: File object (e.g. from an <input type="file">)
+  try {
+    const formData = new FormData();
+    formData.append('Event_ID', eventID);
+    formData.append('excelFile', excelFile);
+
+    const response = await axios.post(
+      `${API_BASE_URL}/Helper/exceltodatabase.php`,
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      }
+    );
+
+    if (response.data?.Status !== true) {
+      throw new Error("Server returned an error status");
+    }
+    return response.data;
+
+  } catch (err) {
+    console.error("Failed to upload Excel for event:", err);
+    throw err;
+  }
+}
+

@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+
+.font-jersey-25 {
+    font-family: "Jersey 25", sans-serif;
+}
+.font-jersey-35 {
+    font-family: "Jersey 35", sans-serif;
+}
+.font-jersey-45 {
+    font-family: "Jersey 45", sans-serif;
+}

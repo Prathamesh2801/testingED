@@ -27,7 +27,7 @@ export default function CredentialSection() {
                     <button
                         type="button"
                         onClick={toggleEventView}
-                        className="inline-flex items-center rounded-2xl bg-emerald-700 px-3 py-2 text-md font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        className="inline-flex items-center rounded-2xl bg-emerald-700 px-3 py-2 text-md font-semibold text-white shadow-xs hover:bg-[linear-gradient(90deg,#2BC155_7.39%,#7BF29C_104.06%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
                         {currentView === "display" ? "Create New Credential" :
                             currentView === "viewCredential" ? "Back to Credentials" : "Display All Credentials"}

@@ -24,7 +24,7 @@ export default function EventBasicInfo({ onSubmit, initialData }) {
   return (
     <div>
       <form onSubmit={handleSubmit} className="flex flex-col">
-        <div className="flex gap-x-6 mb-6">
+        <div className="flex flex-col md:flex-row gap-y-4 md:gap-y-0 md:gap-x-6 mb-6">
           <div className="w-full relative">
             <label className="flex items-center mb-2 text-gray-600 text-sm font-medium">
               Event Name 
@@ -56,7 +56,7 @@ export default function EventBasicInfo({ onSubmit, initialData }) {
           </div>
         </div>
 
-        <div className="flex gap-x-6 mb-6">
+        <div className=" flex flex-col md:flex-row gap-y-4 md:gap-y-0 md:gap-x-6 mb-6">
           <div className="w-full relative">
             <label className="flex items-center mb-2 text-gray-600 text-sm font-medium">
               Event Start Date 
