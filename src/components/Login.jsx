@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { authLogin } from "../utils/EventFetchApi"
 import { Eye, User2 } from "lucide-react"
-import LoginBanner from "../assets/img/loginBanner2.jpg"
+import LoginBanner from "../assets/img/loginBanner3.png"
 import Logo from "../assets/img/logo.png"
 
 function Login() {

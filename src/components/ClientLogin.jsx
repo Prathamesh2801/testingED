@@ -4,7 +4,7 @@ import { fetchEvents, authLogin } from "../utils/EventFetchApi";
 import { API_BASE_URL } from "../config";
 import { useParams, useNavigate } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
-import LoginBanner from '../assets/img/loginBanner2.jpg'
+import LoginBanner from '../assets/img/loginBanner3.png'
 import { Eye, User2 } from "lucide-react";
 
 
