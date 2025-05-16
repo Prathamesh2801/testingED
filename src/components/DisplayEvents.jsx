@@ -20,7 +20,6 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
 
   const navigate = useNavigate()
   const [globalFilter, setGlobalFilter] = useState("")
-
  
 
   const handleDeleteEvent = async (eventId) => {
@@ -224,7 +223,7 @@ export default function DisplayEvents({ events = [], loading, error, pagination,
   }
  
 
-  if (!events || events.length === 0) {
+  if (!events || events.events.length === 0) {
     return (
       <div className="text-center py-12">
         <h3 className="mt-2 text-sm font-medium text-gray-900">No events found</h3>

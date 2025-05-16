@@ -48,6 +48,8 @@ export default function RegistrationForm() {
   const [showCameraModal, setShowCameraModal] = useState(false)
   const [showSkipModal, setShowSkipModal] = useState(false)
 
+
+
   // Fetch event data on component mount
   useEffect(() => {
     async function loadEventData() {
@@ -141,12 +143,37 @@ export default function RegistrationForm() {
     }
   }
 
-  // Render the appropriate screen based on state
+
+  
+
+  const mobileImgURL  = eventData?.event.image1
+    ? `${API_BASE_URL}/${eventData.event.image1}`
+    : null;
+  const tabletImgURL  = eventData?.event.image2
+    ? `${API_BASE_URL}/${eventData.event.image2}`
+    : null;
+  const desktopImgURL = eventData?.event.image3
+    ? `${API_BASE_URL}/${eventData.event.image3}`
+    : null;
+
+  let bgClasses = "bg-center bg-cover bg-no-repeat";
+  bgClasses += mobileImgURL
+    ? ` bg-[url('${mobileImgURL}')]`
+    : " bg-gradient-to-r from-blue-900 via-blue-800 to-blue-500";
+  if (tabletImgURL) bgClasses += ` md:bg-[url('${tabletImgURL}')]`;
+  if (desktopImgURL) bgClasses += ` lg:bg-[url('${desktopImgURL}')]`;
+  
   return (
-    <div className="flex min-h-screen flex-col items-center pt-8 p-4" style={gradientThemes.default}>
+    <div className={`flex min-h-screen flex-col items-center pt-8 p-4 relative bg-page-bg ${bgClasses}`}>
+      {/* Dynamic background style */}
+      {/* <style dangerouslySetInnerHTML={getBackgroundStyle()} /> */}
+      
+      {/* Background overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-30 z-0"></div>
+      
       <Toaster />
 
-      <div className="w-full max-w-sm flex flex-col items-center">
+      <div className="w-full max-w-sm flex flex-col items-center relative z-10">
         {currentScreen === "register" && (
           <RegisterScreen
             formData={formData}
@@ -451,8 +478,9 @@ function RegisterScreen({
         className="w-full p-6 shrink-0 border border-white 
             shadow-[inset_12.867px_12.867px_12.867px_0_rgba(194,194,194,0.1),inset_-12.867px_12.867px_12.867px_0_rgba(255,255,255,0.1)] 
             backdrop-blur-[12.867px] 
-            rounded-[30px]"
-        style={{ background: "linear-gradient(to right, #0d47a1, #1565c0, #1e88e5, #42a5f5)" }}
+            rounded-[30px]
+            bg-opacity-60"
+        style={{ background: "linear-gradient(to right, rgba(13, 71, 161, 0.7), rgba(21, 101, 192, 0.7), rgba(30, 136, 229, 0.7), rgba(66, 165, 245, 0.7))" }} 
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {eventData?.fields?.map((field) => (

@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, NETWORK_ADDRESS } from '../config'
 import { getEventById } from '../utils/EventFetchApi'
+import { QRCodeCanvas } from 'qrcode.react';
+import toast from 'react-hot-toast';
 
 export default function ViewEvent({ viewEventId }) {
   const [eventDetails, setEventDetails] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+  const url = `${NETWORK_ADDRESS}/eventForm/${viewEventId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    setCopied(true);
+    toast.success('URL copied to clipboard!',{duration: 2000});
+    setTimeout(() => setCopied(false), 2000); // reset after 2 sec
+  });
+};
   useEffect(() => {
     async function fetchDetails() {
       try {
@@ -58,13 +68,20 @@ export default function ViewEvent({ viewEventId }) {
       <h2 className="text-2xl font-semibold mb-6">Event Details</h2>
 
       {/* Basic Info Summary */}
-      <div className="mb-8 p-6 border rounded-lg bg-gray-50">
+      <div className="mb-8 p-6 border rounded-lg bg-gray-50 overflow-x-auto">
         <h3 className="text-lg font-medium mb-4">Basic Information</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Event Name</p>
-            <p className="font-medium">{Event_Name}</p>
+        <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
+          <div className='flex flex-col  justify-around' >
+            <div>
+              <p className="text-sm text-gray-500">Event Name</p>
+              <p className="font-medium">{Event_Name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 ">Event Id</p>
+              <p className="font-medium wrap-anywhere">{viewEventId}</p>
+            </div>
           </div>
+
           {Event_Logo && (
             <div>
               <p className="text-sm text-gray-500">Event Logo</p>
@@ -76,13 +93,34 @@ export default function ViewEvent({ viewEventId }) {
             </div>
           )}
           <div>
-            <p className="text-sm text-gray-500">Start Date</p>
+            <p className="text-sm text-gray-500">QrCode</p>
+            <QRCodeCanvas
+              value={`${NETWORK_ADDRESS}/eventForm/${viewEventId}`}
+              size={120}
+              bgColor={"#ffffff"}
+              fgColor={"#000000"}
+              level={"H"}
+              includeMargin={true}
+            />
+            {copied && <p className="text-green-600 text-sm font-medium mt-1">Link copied!</p>}
+          </div>
+          <div className='flex flex-col md:flex-row  md:col-span-2  justify-around  '>
+          <div className='md:mr-60  '>
+            <p className="text-sm text-gray-500 ">Start Date</p>
             <p className="font-medium">{new Date(Event_Start_Date).toLocaleDateString()}</p>
           </div>
-          <div>
+          <div className='md:mr-60'>
             <p className="text-sm text-gray-500">End Date</p>
             <p className="font-medium">{new Date(Event_End_Date).toLocaleDateString()}</p>
           </div>
+          </div>
+          <button
+            onClick={handleCopy}
+            className="mt-2 py-1 px-3 md:w-1/3 col-span-2 md:col-span-1  text-md font-semibold  outline-2 outline-emerald-700 text-emerald-700 rounded hover:bg-emerald-700  hover:outline-none hover:text-white transition duration-200 ease-in-out"
+          >
+            Copy URL
+          </button>
+            
         </div>
       </div>
 
@@ -104,7 +142,7 @@ export default function ViewEvent({ viewEventId }) {
                 {Table_Structure.map((col, idx) => {
                   let displayType = col.Type;
                   let comment = col.Comment;
-                  
+
                   // Try to parse JSON comment if exists
                   let commentObj = {};
                   if (comment && comment.startsWith('{')) {
@@ -117,7 +155,7 @@ export default function ViewEvent({ viewEventId }) {
                       // Use comment as is if parsing fails
                     }
                   }
-                  
+
                   return (
                     <tr key={idx}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{col.Name}</td>
@@ -126,8 +164,8 @@ export default function ViewEvent({ viewEventId }) {
                         {col.IsNull ? 'No' : 'Yes'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {commentObj.Type === "FILE" ? 
-                          `Max size: ${(commentObj.MaxSize / (1024 * 1024)).toFixed(2)} MB` : 
+                        {commentObj.Type === "FILE" ?
+                          `Max size: ${(commentObj.MaxSize / (1024 * 1024)).toFixed(2)} MB` :
                           comment || '-'}
                       </td>
                     </tr>
@@ -144,7 +182,7 @@ export default function ViewEvent({ viewEventId }) {
       {/* Communication Methods Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Communication Methods</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <div>
             <p className="text-sm text-gray-500">WhatsApp</p>
             <p className="font-medium">

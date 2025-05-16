@@ -7,6 +7,12 @@ export default defineConfig({
   server: {
     host: true,
   },
+  safelist: [
+    {
+      // keep any bg-[url(...)] and md:bg-[url(...)] etc.
+      pattern: /^(sm:|md:|lg:|xl:)?bg-\[url\(.*\)\]$/,
+    },
+  ],
   theme:{
     extend:{
       fontFamily:{

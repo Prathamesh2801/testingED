@@ -142,7 +142,6 @@ export const createEvent = async (eventData) => {
         if (!token) {
             throw new Error('No authentication token found. Please login again.');
         }
-
         const formDataObj = new FormData();
 
         // Basic Event Info

@@ -16,6 +16,7 @@ import {
     Bars3Icon,
     ChartPieIcon,
     Cog6ToothIcon,
+    PhotoIcon,
     UsersIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
@@ -25,6 +26,7 @@ import ClientVisuals from './ClientVisuals'
 import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../config'
 import ClientSection from './ClientSection'
+import BackgroundUpload from './BackgroundUpload'
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -58,6 +60,12 @@ export default function ClientDashboard() {
             href: '#/clientDashboard?tab=userdata',
             icon: UsersIcon,
             current: activeTab === 'userdata'
+        },
+        {
+            name: 'Background',
+            href: '#/clientDashboard?tab=background',
+            icon: PhotoIcon,
+            current: activeTab === 'background'
         },
     ]
 
@@ -112,6 +120,8 @@ export default function ClientDashboard() {
                 return <ClientVisuals />
             case 'userdata':
                 return <ClientSection />
+            case 'background':
+                return <BackgroundUpload />
             default:
                 return <ClientVisuals />
         }
@@ -207,7 +217,7 @@ export default function ClientDashboard() {
                                                 Settings
                                             </a>
                                         </li>
-                                        
+
                                         {/* Add Sign Out option directly in the mobile sidebar */}
                                         <li>
                                             <button
@@ -310,7 +320,7 @@ export default function ClientDashboard() {
                                     </Link>
                                 )}
                             </div>
-                            
+
                             {/* Separator */}
                             <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
 

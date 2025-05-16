@@ -299,7 +299,7 @@ export default function ClientDataTable({onRefresh}) {
 
           <div className="mt-3 sm:mt-0 sm:ml-4 flex flex-col sm:flex-row sm:items-center gap-3">
             {/* Search box */}
-            <div className="relative rounded-md shadow-sm">
+            <div className="relative  shadow-sm">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </div>

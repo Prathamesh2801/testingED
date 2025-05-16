@@ -2,6 +2,7 @@
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost/Registration/API';
 
+export const NETWORK_ADDRESS = 'http://192.168.1.50:5173/#'
 
 // gradientThemes.ts
 export const gradientThemes = {

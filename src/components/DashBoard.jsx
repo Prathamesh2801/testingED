@@ -4,15 +4,17 @@ import Logo from "../assets/img/logo.png"
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { getAllEvents } from "../utils/EventFetchApi"
-import { 
-  Bars3Icon, 
-  IdentificationIcon, 
-  UsersIcon, 
+import {
+  Bars3Icon,
+  IdentificationIcon,
+  UsersIcon,
   XMarkIcon,
-  ArrowRightOnRectangleIcon  // Added sign-out icon
+  ArrowRightOnRectangleIcon,  // Added sign-out icon
+  PhotoIcon
 } from "@heroicons/react/24/outline"
 import EventSection from "./EventSection"
 import CredentialSection from "./CredentialSection"
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -44,7 +46,7 @@ function DashBoard() {
       href: "/dashboard?tab=credentials",
       icon: IdentificationIcon,
       current: activeTab === "credentials",
-    },
+    }
   ]
 
   // Handle sign out
@@ -117,8 +119,8 @@ function DashBoard() {
     } else {
       navigate(`/dashboard?tab=${tab.toLowerCase()}`)
     }
-  
-      setSidebarOpen(false)
+
+    setSidebarOpen(false)
 
   }
 
@@ -144,7 +146,7 @@ function DashBoard() {
         )
       case "credentials":
         return <CredentialSection />
-
+  
       default:
         return (
           <EventSection
@@ -261,7 +263,7 @@ function DashBoard() {
                   </a>
                 </li>
               ))}
-              
+
               {/* Sign out button for desktop - positioned at bottom */}
               <li className="mt-auto absolute bottom-10 w-[225px]">
                 <button

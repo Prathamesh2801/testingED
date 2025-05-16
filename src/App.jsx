@@ -1,8 +1,6 @@
-import React from 'react'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import RegistrationForm from './components/RegistrationForm'
 import WebcamComponent from './components/WebCamComponent'
-import SuccessWelcome from './components/SuccessWelcome'
 import DashBoard from './components/DashBoard'
 import Login from './components/Login'
 import GeoLocation from './components/GeoLocation'
@@ -13,6 +11,7 @@ import ClientLogin from './components/ClientLogin'
 import { ProtectedClientRoutes } from './routes/ProtectedClientRoutes'
 import ErrorPage from './components/ErrorPage'
 import TestWebCapture from './components/TestWebCapture'
+import QRScanner from './components/QrScanner'
 
 function App() {
   return (
@@ -24,14 +23,17 @@ function App() {
       <Routes>
         <Route path="/eventForm/:eventId" element={<RegistrationForm />} />
         <Route path="/upload" element={<WebcamComponent />} />
-        <Route path="/success/:id" element={<SuccessWelcome />} />
         <Route path="/geolocation" element={<GeoLocation />} />
         <Route path="/login" element={<Login />} />
         <Route path="/clientLogin/:eventId" element={<ClientLogin />} />
         <Route path="/capture" element={<TestWebCapture />} />
         <Route path="/noauth" element={<ErrorPage title="Access Denied" msg="Log through proper credentials" status={401} />} />
+        
         <Route path="/clientDashboard" element={<ProtectedClientRoutes>
           <ClientDashboard />
+        </ProtectedClientRoutes>} />
+        <Route path="/qrscan" element={<ProtectedClientRoutes>
+          <QRScanner />
         </ProtectedClientRoutes>} />
         <Route path="/dashboard" element={
           <ProtectedRoutes>

@@ -45,7 +45,7 @@ export default function CreateNewCredentials() {
         const { name, value } = e.target
 
         if (name === 'role') {
-            setShowEventId(value === 'Client')
+            setShowEventId(value === 'Client' || value === 'Scanner')
             setFormData({
                 ...formData,
                 [name]: value
@@ -93,10 +93,7 @@ export default function CreateNewCredentials() {
         e.preventDefault();
         try {
 
-            // if (!formData.username || !formData.password || (formData.role === "Client" && !formData.eventId)) {
-            //     toast.error("Please fill all required fields");
-            //     return;
-            // }
+       
             const response = await createCredential(formData);
             toast.success("Credential created successfully!");
 
@@ -105,7 +102,7 @@ export default function CreateNewCredentials() {
                 navigate('/dashboard?tab=credentials&view=display');
             }, 500);
         } catch (error) {
-            toast.error(error.message || "Failed to create credential");
+            toast.error(error.response.data.Message || "Failed to create credential");
         }
     };
 
@@ -188,6 +185,7 @@ export default function CreateNewCredentials() {
                                     >
                                         <option value="Admin">Admin</option>
                                         <option value="Client">Client</option>
+                                        <option value="Scanner">Scanner</option>
                                     </select>
                                     <ChevronDownIcon
                                         aria-hidden="true"

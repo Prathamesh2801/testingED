@@ -33,7 +33,7 @@ export async function createCredential({ username, password, role, eventId }) {
       Username: username,
       Password: password,
       Role: role,
-      Event_ID: role === "Client" ? eventId : ''
+      Event_ID: role === "Client" || role === "Scanner" ? eventId : ''
     });
 
     const response = await axios.post(
