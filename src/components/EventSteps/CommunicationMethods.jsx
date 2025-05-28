@@ -8,7 +8,8 @@ export default function CommunicationMethods({ onSubmit, onPrevious, formData })
     qrCode: formData?.contactMethods?.qrCode || false,
     faceRegistration: formData?.contactMethods?.faceRegistration || false,
     quiz: formData?.contactMethods?.quiz || false,
-    polls: formData?.contactMethods?.polls || false
+    polls: formData?.contactMethods?.polls || false,
+    app: formData?.contactMethods?.app || false
   });
 
   const [selectedFields, setSelectedFields] = useState({
@@ -71,6 +72,7 @@ export default function CommunicationMethods({ onSubmit, onPrevious, formData })
         // Add additional features
         quiz: contactMethods.quiz,
         polls: contactMethods.polls,
+        app:contactMethods.app,
         // Fields and template data
         whatsappField: selectedFields.whatsapp,
         whatsappTemplateId: templateIds.whatsapp,
@@ -84,7 +86,8 @@ export default function CommunicationMethods({ onSubmit, onPrevious, formData })
     // Verify additional features specifically
     console.log('Additional features:', {
       quiz: contactMethods.quiz,
-      polls: contactMethods.polls
+      polls: contactMethods.polls,
+      app: contactMethods.app
     });
 
     onSubmit(communicationData);
@@ -249,6 +252,16 @@ export default function CommunicationMethods({ onSubmit, onPrevious, formData })
                     className="mr-2 h-4 w-4 text-indigo-600"
                   />
                 Polls
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="app"
+                    checked={contactMethods.app}
+                    onChange={handleContactMethodChange}
+                    className="mr-2 h-4 w-4 text-indigo-600"
+                  />
+                App
                 </label>
               </div>
             </div>

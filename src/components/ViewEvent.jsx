@@ -1,50 +1,50 @@
-import React, { useEffect, useState } from 'react'
-import { API_BASE_URL, NETWORK_ADDRESS } from '../config'
-import { getEventById } from '../utils/EventFetchApi'
-import { QRCodeCanvas } from 'qrcode.react';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { API_BASE_URL, NETWORK_ADDRESS } from "../config";
+import { getEventById } from "../utils/EventFetchApi";
+import { QRCodeCanvas } from "qrcode.react";
+import toast from "react-hot-toast";
 
 export default function ViewEvent({ viewEventId }) {
-  const [eventDetails, setEventDetails] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [eventDetails, setEventDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
-  const url = `${NETWORK_ADDRESS}/eventForm/${viewEventId}`;
-  navigator.clipboard.writeText(url).then(() => {
-    setCopied(true);
-    toast.success('URL copied to clipboard!',{duration: 2000});
-    setTimeout(() => setCopied(false), 2000); // reset after 2 sec
-  });
-};
+    const url = `${NETWORK_ADDRESS}/eventForm/${viewEventId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      toast.success("URL copied to clipboard!", { duration: 2000 });
+      setTimeout(() => setCopied(false), 2000); // reset after 2 sec
+    });
+  };
   useEffect(() => {
     async function fetchDetails() {
       try {
-        const response = await getEventById(viewEventId)
-        setEventDetails(response.Data)
+        const response = await getEventById(viewEventId);
+        setEventDetails(response.Data);
       } catch (err) {
-        console.error('Error fetching event details:', err)
-        setError('Failed to load event details.')
+        console.error("Error fetching event details:", err);
+        setError("Failed to load event details.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
     if (viewEventId) {
-      fetchDetails()
+      fetchDetails();
     }
-  }, [viewEventId])
+  }, [viewEventId]);
 
   if (loading) {
-    return <p className="text-center py-4">Loading event details...</p>
+    return <p className="text-center py-4">Loading event details...</p>;
   }
 
   if (error) {
-    return <p className="text-center py-4 text-red-600">{error}</p>
+    return <p className="text-center py-4 text-red-600">{error}</p>;
   }
 
   if (!eventDetails) {
-    return <p className="text-center py-4">No event found.</p>
+    return <p className="text-center py-4">No event found.</p>;
   }
 
   const {
@@ -60,8 +60,9 @@ export default function ViewEvent({ viewEventId }) {
     IsFaceRec,
     IsQuiz,
     IsPoll,
+    IsApp,
     Table_Structure,
-  } = eventDetails
+  } = eventDetails;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -71,7 +72,7 @@ export default function ViewEvent({ viewEventId }) {
       <div className="mb-8 p-6 border rounded-lg bg-gray-50 overflow-x-auto">
         <h3 className="text-lg font-medium mb-4">Basic Information</h3>
         <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
-          <div className='flex flex-col  justify-around' >
+          <div className="flex flex-col  justify-around">
             <div>
               <p className="text-sm text-gray-500">Event Name</p>
               <p className="font-medium">{Event_Name}</p>
@@ -102,17 +103,25 @@ export default function ViewEvent({ viewEventId }) {
               level={"H"}
               includeMargin={true}
             />
-            {copied && <p className="text-green-600 text-sm font-medium mt-1">Link copied!</p>}
+            {copied && (
+              <p className="text-green-600 text-sm font-medium mt-1">
+                Link copied!
+              </p>
+            )}
           </div>
-          <div className='flex flex-col md:flex-row  md:col-span-2  justify-around  '>
-          <div className='md:mr-60  '>
-            <p className="text-sm text-gray-500 ">Start Date</p>
-            <p className="font-medium">{new Date(Event_Start_Date).toLocaleDateString()}</p>
-          </div>
-          <div className='md:mr-60'>
-            <p className="text-sm text-gray-500">End Date</p>
-            <p className="font-medium">{new Date(Event_End_Date).toLocaleDateString()}</p>
-          </div>
+          <div className="flex flex-col md:flex-row  md:col-span-2  justify-around  ">
+            <div className="md:mr-60  ">
+              <p className="text-sm text-gray-500 ">Start Date</p>
+              <p className="font-medium">
+                {new Date(Event_Start_Date).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="md:mr-60">
+              <p className="text-sm text-gray-500">End Date</p>
+              <p className="font-medium">
+                {new Date(Event_End_Date).toLocaleDateString()}
+              </p>
+            </div>
           </div>
           <button
             onClick={handleCopy}
@@ -120,7 +129,6 @@ export default function ViewEvent({ viewEventId }) {
           >
             Copy URL
           </button>
-            
         </div>
       </div>
 
@@ -132,10 +140,18 @@ export default function ViewEvent({ viewEventId }) {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Field Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comment</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Field Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Required
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Comment
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -145,11 +161,13 @@ export default function ViewEvent({ viewEventId }) {
 
                   // Try to parse JSON comment if exists
                   let commentObj = {};
-                  if (comment && comment.startsWith('{')) {
+                  if (comment && comment.startsWith("{")) {
                     try {
                       commentObj = JSON.parse(comment);
                       if (commentObj.Type === "FILE") {
-                        displayType = `FILE (${commentObj.AllowedTypes.join(', ')})`;
+                        displayType = `FILE (${commentObj.AllowedTypes.join(
+                          ", "
+                        )})`;
                       }
                     } catch (e) {
                       // Use comment as is if parsing fails
@@ -158,15 +176,22 @@ export default function ViewEvent({ viewEventId }) {
 
                   return (
                     <tr key={idx}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{col.Name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{displayType}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {col.IsNull ? 'No' : 'Yes'}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {col.Name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {commentObj.Type === "FILE" ?
-                          `Max size: ${(commentObj.MaxSize / (1024 * 1024)).toFixed(2)} MB` :
-                          comment || '-'}
+                        {displayType}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {col.IsNull ? "No" : "Yes"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {commentObj.Type === "FILE"
+                          ? `Max size: ${(
+                              commentObj.MaxSize /
+                              (1024 * 1024)
+                            ).toFixed(2)} MB`
+                          : comment || "-"}
                       </td>
                     </tr>
                   );
@@ -182,52 +207,62 @@ export default function ViewEvent({ viewEventId }) {
       {/* Communication Methods Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Communication Methods</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
             <p className="text-sm text-gray-500">WhatsApp</p>
             <p className="font-medium">
               {Event_WhatsApp_Column_Name
                 ? `Enabled (Field: ${Event_WhatsApp_Column_Name})`
-                : 'Disabled'}
+                : "Disabled"}
             </p>
             {Event_WhatsApp_Template_ID && (
-              <p className="text-sm text-gray-500">Template ID: {Event_WhatsApp_Template_ID}</p>
+              <p className="text-sm text-gray-500">
+                Template ID: {Event_WhatsApp_Template_ID}
+              </p>
             )}
           </div>
           <div>
             <p className="text-sm text-gray-500">Email</p>
             <p className="font-medium">
               {IsEmail === "1"
-                ? `Enabled (Field: ${Event_Email_Column_Name || 'Not specified'})`
-                : 'Disabled'}
+                ? `Enabled (Field: ${
+                    Event_Email_Column_Name || "Not specified"
+                  })`
+                : "Disabled"}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">QR Code Registration</p>
             <p className="font-medium">
-              {IsQRCode === "1" ? 'Enabled' : 'Disabled'}
+              {IsQRCode === "1" ? "Enabled" : "Disabled"}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Face Registration</p>
             <p className="font-medium">
-              {IsFaceRec === "1" ? 'Enabled' : 'Disabled'}
+              {IsFaceRec === "1" ? "Enabled" : "Disabled"}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Quiz Feature</p>
             <p className="font-medium">
-              {IsQuiz === "1" ? 'Enabled' : 'Disabled'}
+              {IsQuiz === "1" ? "Enabled" : "Disabled"}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Polls Feature</p>
             <p className="font-medium">
-              {IsPoll === "1" ? 'Enabled' : 'Disabled'}
+              {IsPoll === "1" ? "Enabled" : "Disabled"}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">App Feature</p>
+            <p className="font-medium">
+              {IsApp === "1" ? "Enabled" : "Disabled"}
             </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

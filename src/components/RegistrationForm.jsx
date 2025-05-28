@@ -39,7 +39,7 @@ function Modal({ isOpen, onClose, title, children }) {
 // Main component that manages screen state
 export default function RegistrationForm() {
   const { eventId } = useParams()
-  const [currentScreen, setCurrentScreen] = useState("register")
+const [currentScreen, setCurrentScreen] = useState("register")
   const [formData, setFormData] = useState({})
   const [eventData, setEventData] = useState(null)
   const [error, setError] = useState(null)
@@ -47,10 +47,8 @@ export default function RegistrationForm() {
   const [registrationData, setRegistrationData] = useState(null)
   const [showCameraModal, setShowCameraModal] = useState(false)
   const [showSkipModal, setShowSkipModal] = useState(false)
-
-
-
-  // Fetch event data on component mount
+ 
+   // Fetch event data on component mount
   useEffect(() => {
     async function loadEventData() {
       try {
@@ -73,6 +71,26 @@ export default function RegistrationForm() {
       loadEventData()
     }
   }, [eventId])
+
+  const mobileImgURL = eventData?.event.image1
+    ? `${API_BASE_URL}/${eventData.event.image1}`
+    : null;
+  const tabletImgURL = eventData?.event.image2
+    ? `${API_BASE_URL}/${eventData.event.image2}`
+    : null;
+  const desktopImgURL = eventData?.event.image3
+    ? `${API_BASE_URL}/${eventData.event.image3}`
+    : null;
+
+  // Fallback gradient if no image
+  const fallbackGradient =
+    "linear-gradient(to right, #0d47a1, #1565c0, #1e88e5, #42a5f5)";
+
+  
+
+ const [bgUrl, setBgUrl] = useState(mobileImgURL || fallbackGradient);
+
+ 
 
   // Navigation functions
   const goToLoading = () => setCurrentScreen("loading")
@@ -143,34 +161,43 @@ export default function RegistrationForm() {
     }
   }
 
-
   
 
-  const mobileImgURL  = eventData?.event.image1
-    ? `${API_BASE_URL}/${eventData.event.image1}`
-    : null;
-  const tabletImgURL  = eventData?.event.image2
-    ? `${API_BASE_URL}/${eventData.event.image2}`
-    : null;
-  const desktopImgURL = eventData?.event.image3
-    ? `${API_BASE_URL}/${eventData.event.image3}`
-    : null;
 
-  let bgClasses = "bg-center bg-cover bg-no-repeat";
-  bgClasses += mobileImgURL
-    ? ` bg-[url('${mobileImgURL}')]`
-    : " bg-gradient-to-r from-blue-900 via-blue-800 to-blue-500";
-  if (tabletImgURL) bgClasses += ` md:bg-[url('${tabletImgURL}')]`;
-  if (desktopImgURL) bgClasses += ` lg:bg-[url('${desktopImgURL}')]`;
-  
+  useEffect(() => {
+    const updateBg = () => {
+      if (window.matchMedia("(min-width:1024px)").matches) {
+        setBgUrl(desktopImgURL || tabletImgURL || mobileImgURL || fallbackGradient);
+      } else if (window.matchMedia("(min-width:768px)").matches) {
+        setBgUrl(tabletImgURL || mobileImgURL || fallbackGradient);
+      } else {
+        setBgUrl(mobileImgURL || fallbackGradient);
+      }
+    };
+
+    updateBg();                                             
+    window.addEventListener("resize", updateBg);            
+    return () => window.removeEventListener("resize", updateBg);
+  }, [mobileImgURL, tabletImgURL, desktopImgURL]);
+
+
+
   return (
-    <div className={`flex min-h-screen flex-col items-center pt-8 p-4 relative bg-page-bg ${bgClasses}`}>
-      {/* Dynamic background style */}
-      {/* <style dangerouslySetInnerHTML={getBackgroundStyle()} /> */}
-      
+    <div className={`flex min-h-screen flex-col items-center pt-8 p-4 relative`} style={{
+      backgroundImage: bgUrl.startsWith("linear-gradient")
+        ? bgUrl
+        : `url(${bgUrl})`,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "center",
+      backgroundSize: "cover",
+    
+    }}>
+
+
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-30 z-0"></div>
-      
+      {/* <div className="absolute inset-0 bg-[rgba(0,0,0,0.6)]"></div> */}
+      {/* <div className="absolute bg-gradient-to-tl from-indigo-600  to-green-600 opacity-80 inset-0 "></div> */}
+
       <Toaster />
 
       <div className="w-full max-w-sm flex flex-col items-center relative z-10">
@@ -469,8 +496,8 @@ function RegisterScreen({
         <img alt="Company Logo" src={`${API_BASE_URL}/uploads/event_logos/${eventData.event.Event_Logo}`} className="h-20 w-20 my-1 border-2 border-white rounded-full" />
       </div>
 
-      <h1 className="text-4xl text-white mb-1 font-jersey-25 tracking-wider">{eventData?.event?.Event_Name || "Event Name"}</h1>
-      <p className="text-white text-2xl tracking-wider mb-6 font-jersey-25">Create an account</p>
+      <h1 className="text-4xl text-white mb-1 font-bold tracking-wider">{eventData?.event?.Event_Name || "Event Name"}</h1>
+      <p className="text-white text-2xl tracking-wider mb-6 font-bold">Create an account</p>
 
       {error && <div className="w-full p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">{error}</div>}
 
@@ -480,7 +507,7 @@ function RegisterScreen({
             backdrop-blur-[12.867px] 
             rounded-[30px]
             bg-opacity-60"
-        style={{ background: "linear-gradient(to right, rgba(13, 71, 161, 0.7), rgba(21, 101, 192, 0.7), rgba(30, 136, 229, 0.7), rgba(66, 165, 245, 0.7))" }} 
+        // style={{ background: "linear-gradient(to right, rgba(13, 71, 161, 0.7), rgba(21, 101, 192, 0.7), rgba(30, 136, 229, 0.7), rgba(66, 165, 245, 0.7))" }}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {eventData?.fields?.map((field) => (
@@ -529,7 +556,7 @@ function FaceRecScreen({ eventData }) {
 
       <img alt="Company Logo" src={`${API_BASE_URL}/uploads/event_logos/${eventData.event.Event_Logo}`} className="h-20 w-20 my-1 border-2 border-white rounded-full" />
 
-      <h1 className="text-4xl text-white mb-1 font-jersey-25 tracking-wider">{eventData?.event?.Event_Name || "Event Name"}</h1>
+      <h1 className="text-4xl text-white mb-1 font-bold tracking-wider">{eventData?.event?.Event_Name || "Event Name"}</h1>
 
       {/* Passport‑style webcam */}
       <div className="bg-white p-2 rounded-lg shadow-md">
@@ -711,7 +738,7 @@ function DownloadScreen({ onComplete }) {
         </div>
       </div>
 
-      <h2 className="text-white text-3xl tracking-wider font-jersey-25 text-center">Your ticket is being downloaded</h2>
+      <h2 className="text-white text-3xl tracking-wider font-bold text-center">Your ticket is being downloaded</h2>
     </>
   )
 }

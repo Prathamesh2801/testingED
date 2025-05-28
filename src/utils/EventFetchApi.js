@@ -176,6 +176,8 @@ export const createEvent = async (eventData) => {
         formDataObj.append("Event_IsPoll", eventData.communication.contactMethods.polls ? "1" : "0");
         formDataObj.append("Event_IsQRCode", eventData.communication.contactMethods.qrCode ? "1" : "0");
         formDataObj.append("Event_IsFaceRec", eventData.communication.contactMethods.faceRegistration ? "1" : "0");
+        formDataObj.append("Event_IsApp", eventData.communication.contactMethods.app ? "1" : "0");
+
 
         // Debug log the form data
         for (let pair of formDataObj.entries()) {

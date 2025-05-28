@@ -139,7 +139,7 @@ export  default  function EventPreview({ formData, onSubmit, onPrevious }) {
       {/* Communication Methods Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Communication Methods</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <div>
             <p className="text-sm text-gray-500">WhatsApp</p>
             <p className="font-medium">
@@ -181,6 +181,12 @@ export  default  function EventPreview({ formData, onSubmit, onPrevious }) {
             <p className="text-sm text-gray-500">Polls Feature</p>
             <p className="font-medium">
               {formData.communication.contactMethods.polls ? 'Enabled' : 'Disabled'}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">App Feature</p>
+            <p className="font-medium">
+              {formData.communication.contactMethods.app ? 'Enabled' : 'Disabled'}
             </p>
           </div>
         </div>
