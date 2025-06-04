@@ -33,7 +33,7 @@ export default function ClientDataTable({onRefresh}) {
     try {
       setLoading(true)
       const response = await getUserDataByClient(localStorage.getItem("eventId") || "")
-      console.log("Client Data:", response)
+      // console.log("Client Data:", response)
 
       if (response) {
         setUserData(response)
@@ -70,7 +70,7 @@ export default function ClientDataTable({onRefresh}) {
     async function loadEventData() {
       try {
         const data = await fetchEvents(eventId)
-        console.log("Event Data:", data)
+        // console.log("Event Data:", data)
         setEventData(data.Data.event)
       } catch (err) {
         console.error(err)
@@ -376,12 +376,14 @@ export default function ClientDataTable({onRefresh}) {
                     <button
                       onClick={() => handleEdit(item.User_ID)}
                       className="text-indigo-600 hover:text-indigo-800 font-medium"
+                      title="Edit User"
                     >
                       <PencilSquareIcon className="h-5 w-5 inline-block" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => handleDelete(item.User_ID)}
                       className="text-red-600 hover:text-red-800 font-medium"
+                      title="Delete User"
                     >
                       <TrashIcon className="h-5 w-5 inline-block" aria-hidden="true" />
                     </button>

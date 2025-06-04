@@ -1,15 +1,23 @@
+"use client";
+
 import { useState, useEffect, useMemo } from "react";
-import { fetchScheduleAdmin, deleteSchedule } from "../../utils/Schedule";
+import {
+  deleteSpecificPoll,
+  fetchAllPolls,
+  updatePollStatus,
+} from "../../utils/Poll";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import { TrashIcon } from "@heroicons/react/24/outline";
-
+import {
+  TrashIcon,
+  PencilSquareIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 
-export default function ScheduleTable({ onRefresh }) {
+export default function PollTable({ onRefresh, onEdit, onView }) {
   const eventId = localStorage.getItem("eventId");
-  const [scheduleData, setScheduleData] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const [pollData, setPollData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,33 +26,20 @@ export default function ScheduleTable({ onRefresh }) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
-  const fetchSchedules = async () => {
+  const fetchPolls = async () => {
     try {
       setLoading(true);
-      console.log("Event Id in Schedule Table : ", eventId);
-      const response = await fetchScheduleAdmin(eventId);
-      console.log("Schedule Data:", response);
+      console.log("Event Id in Poll Table : ", eventId);
+      const response = await fetchAllPolls(eventId);
+      console.log("Poll Data:", response);
 
       if (response) {
-        setScheduleData(response);
-
-        // Extract column names from the first item
-        if (response.length > 0) {
-          // Get all keys from the first item
-          const allKeys = Object.keys(response[0]);
-
-          // Filter out any internal keys or keys you want to always exclude
-          const filteredColumns = allKeys.filter(
-            (key) => !["__v", "_id", "Created_AT", "Event_ID"].includes(key)
-          );
-
-          setColumns(filteredColumns);
-        }
+        setPollData(response);
       } else {
         setError("Invalid data format received from API");
       }
     } catch (err) {
-      console.error("Error fetching schedule data:", err);
+      console.error("Error fetching poll data:", err);
       setError("Failed to load data. Please try again later.");
     } finally {
       setLoading(false);
@@ -52,16 +47,54 @@ export default function ScheduleTable({ onRefresh }) {
   };
 
   useEffect(() => {
-    fetchSchedules();
+    fetchPolls();
   }, [eventId, onRefresh]);
 
-  async function handleDelete(scheduleId) {
+  // Handle Live status toggle
+  const handleLiveToggle = async (pollId, currentStatus) => {
+    try {
+      await updatePollStatus(
+        eventId,
+        pollId,
+        currentStatus === "1" ? "0" : "1"
+      );
+
+      setPollData((prevData) =>
+        prevData.map((poll) =>
+          poll.Poll_ID === pollId
+            ? { ...poll, Live: currentStatus === "1" ? "0" : "1" }
+            : poll
+        )
+      );
+
+      toast.success(
+        `Poll ${
+          currentStatus === "1" ? "deactivated" : "activated"
+        } successfully!`
+      );
+    } catch (error) {
+      toast.error("Failed to update poll status");
+    }
+  };
+
+  // Handle actions
+  const handleView = (pollId) => {
+    console.log("View poll:", pollId);
+    onView(pollId);
+  };
+
+  const handleEdit = (pollId) => {
+    console.log("Edit poll:", pollId);
+    onEdit(pollId);
+  };
+
+  async function handleDelete(pollId) {
     toast.promise(
-      deleteSchedule(eventId, scheduleId).then(() => fetchSchedules()),
+      deleteSpecificPoll(eventId, pollId).then(() => fetchPolls()),
       {
-        loading: "Deleting schedule...",
-        success: "Schedule deleted successfully!",
-        error: "Failed to delete schedule.",
+        loading: "Deleting Poll...",
+        success: "Poll deleted successfully!",
+        error: "Failed to delete Poll.",
       }
     );
   }
@@ -70,23 +103,28 @@ export default function ScheduleTable({ onRefresh }) {
   const fuzzySearch = (item, term) => {
     if (!term || term === "") return true;
 
-    // Convert search term to lowercase
     const searchLower = term.toLowerCase();
 
-    // Check if any field contains the search term
-    return Object.values(item).some((value) => {
-      if (value === null || value === undefined) return false;
+    // Search in Question and Options
+    const searchableFields = [
+      item.Question,
+      item.Option1,
+      item.Option2,
+      item.Option3,
+      item.Option4,
+    ];
+
+    return searchableFields.some((value) => {
+      if (value === null || value === undefined || value === "") return false;
       return String(value).toLowerCase().includes(searchLower);
     });
   };
 
   // Handle column sorting
   const handleSort = (column) => {
-    // If clicking the same column, toggle direction
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      // If clicking a new column, set it as sort column with ascending direction
       setSortColumn(column);
       setSortDirection("asc");
     }
@@ -94,34 +132,25 @@ export default function ScheduleTable({ onRefresh }) {
 
   // Filter and sort data
   const filteredData = useMemo(() => {
-    let filtered = scheduleData.filter((item) => fuzzySearch(item, searchTerm));
+    let filtered = pollData.filter((item) => fuzzySearch(item, searchTerm));
 
-    // Apply sorting if a column is selected
     if (sortColumn) {
       filtered = [...filtered].sort((a, b) => {
-        const valueA = a[sortColumn];
-        const valueB = b[sortColumn];
+        let valueA = a[sortColumn];
+        let valueB = b[sortColumn];
 
-        // Handle different data types
-        if (typeof valueA === "boolean" && typeof valueB === "boolean") {
-          return sortDirection === "asc"
-            ? valueA === valueB
-              ? 0
-              : valueA
-              ? -1
-              : 1
-            : valueA === valueB
-            ? 0
-            : valueA
-            ? 1
-            : -1;
+        // Handle Live status sorting (convert to number for proper sorting)
+        if (sortColumn === "Live") {
+          valueA = Number.parseInt(valueA) || 0;
+          valueB = Number.parseInt(valueB) || 0;
+          return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
         }
 
-        // Handle null/undefined values
-        if (valueA === null || valueA === undefined)
-          return sortDirection === "asc" ? 1 : -1;
-        if (valueB === null || valueB === undefined)
-          return sortDirection === "asc" ? -1 : 1;
+        // Handle empty/null values for options
+        if (valueA === null || valueA === undefined || valueA === "")
+          valueA = "";
+        if (valueB === null || valueB === undefined || valueB === "")
+          valueB = "";
 
         // String comparison (case insensitive)
         if (typeof valueA === "string" && typeof valueB === "string") {
@@ -130,13 +159,12 @@ export default function ScheduleTable({ onRefresh }) {
             : valueB.localeCompare(valueA);
         }
 
-        // Number comparison
         return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
       });
     }
 
     return filtered;
-  }, [scheduleData, searchTerm, sortColumn, sortDirection]);
+  }, [pollData, searchTerm, sortColumn, sortDirection]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -154,33 +182,12 @@ export default function ScheduleTable({ onRefresh }) {
   // Handle items per page change
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1);
   };
 
-  // Format column header
-  const formatColumnHeader = (column) => {
-    // Replace underscores with spaces and capitalize each word
-    return column
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
-  // Format cell content
-  const formatCellContent = (key, value) => {
-    // Handle date fields
-    if (key.includes("Date") && value) {
-      const date = new Date(value);
-      return date.toLocaleDateString();
-    }
-
-    // Handle time fields
-    if (key.includes("Time") && value) {
-      return value;
-    }
-
-    // Default formatting for other values
-    return String(value || "-");
+  // Format option display
+  const formatOption = (option) => {
+    return option && option.trim() !== "" ? option : "-";
   };
 
   // Render loading state
@@ -189,7 +196,7 @@ export default function ScheduleTable({ onRefresh }) {
       <div className="min-h-[400px] flex justify-center items-center">
         <div className="animate-pulse flex flex-col items-center">
           <div className="rounded-full bg-gray-300 h-12 w-12 mb-4"></div>
-          <div className="text-gray-600">Loading schedule data...</div>
+          <div className="text-gray-600">Loading poll data...</div>
         </div>
       </div>
     );
@@ -208,13 +215,13 @@ export default function ScheduleTable({ onRefresh }) {
   }
 
   // Render empty state
-  if (scheduleData.length === 0) {
+  if (pollData.length === 0) {
     return (
       <div className="min-h-[400px] flex justify-center items-center">
         <div className="text-gray-500 text-center">
-          <div className="text-2xl mb-2">No schedules available</div>
+          <div className="text-2xl mb-2">No polls available</div>
           <div className="text-sm">
-            There are currently no schedule records to display.
+            There are currently no poll records to display.
           </div>
         </div>
       </div>
@@ -226,7 +233,7 @@ export default function ScheduleTable({ onRefresh }) {
       {/* Search and controls */}
       <div className="p-4 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium leading-6 text-gray-900">
-          Event Schedule
+          Event Polls
         </h3>
 
         <div className="mt-3 sm:mt-0 sm:ml-4 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -241,11 +248,11 @@ export default function ScheduleTable({ onRefresh }) {
             <input
               type="text"
               className="block w-full rounded-2xl border-0 py-1.5 pl-10 px-16 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
-              placeholder="Search schedules..."
+              placeholder="Search polls..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setCurrentPage(1); // Reset to first page on search
+                setCurrentPage(1);
               }}
             />
           </div>
@@ -279,23 +286,90 @@ export default function ScheduleTable({ onRefresh }) {
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="bg-gray-50">
             <tr>
-              {columns.map((column) => (
-                <th
-                  key={column}
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort(column)}
-                >
-                  <div className="flex items-center space-x-1 font-bold text-gray-700">
-                    <span>{formatColumnHeader(column)}</span>
-                    {sortColumn === column && (
-                      <span className="inline-block">
-                        {sortDirection === "asc" ? "⬆️" : "⬇️"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-              ))}
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("Question")}
+              >
+                <div className="flex items-center space-x-1 font-bold text-gray-700">
+                  <span>Question</span>
+                  {sortColumn === "Question" && (
+                    <span className="inline-block">
+                      {sortDirection === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("Option1")}
+              >
+                <div className="flex items-center space-x-1 font-bold text-gray-700">
+                  <span>Option 1</span>
+                  {sortColumn === "Option1" && (
+                    <span className="inline-block">
+                      {sortDirection === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("Option2")}
+              >
+                <div className="flex items-center space-x-1 font-bold text-gray-700">
+                  <span>Option 2</span>
+                  {sortColumn === "Option2" && (
+                    <span className="inline-block">
+                      {sortDirection === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("Option3")}
+              >
+                <div className="flex items-center space-x-1 font-bold text-gray-700">
+                  <span>Option 3</span>
+                  {sortColumn === "Option3" && (
+                    <span className="inline-block">
+                      {sortDirection === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("Option4")}
+              >
+                <div className="flex items-center space-x-1 font-bold text-gray-700">
+                  <span>Option 4</span>
+                  {sortColumn === "Option4" && (
+                    <span className="inline-block">
+                      {sortDirection === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("Live")}
+              >
+                <div className="flex items-center space-x-1 font-bold text-gray-700">
+                  <span>Status</span>
+                  {sortColumn === "Live" && (
+                    <span className="inline-block">
+                      {sortDirection === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  )}
+                </div>
+              </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider"
@@ -305,30 +379,75 @@ export default function ScheduleTable({ onRefresh }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedData.map((item, itemIndex) => (
+            {paginatedData.map((poll, itemIndex) => (
               <tr
-                key={itemIndex}
+                key={poll.Poll_ID}
                 className={itemIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}
               >
-                {columns.map((column) => (
-                  <td
-                    key={`${itemIndex}-${column}`}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-800"
-                  >
-                    {formatCellContent(column, item[column])}
-                  </td>
-                ))}
-                <td className="px-6 py-4 space-x-6 whitespace-nowrap text-sm text-gray-800">
+                <td className="px-6 py-4 text-sm text-gray-800 max-w-xs">
+                  <div className="truncate" title={poll.Question}>
+                    {poll.Question}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  {formatOption(poll.Option1)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  {formatOption(poll.Option2)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  {formatOption(poll.Option3)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  {formatOption(poll.Option4)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                   <button
-                    onClick={() => handleDelete(item.ID)}
-                    className="text-red-600 hover:text-red-800 font-medium"
-                    title="Delete Schedule"
+                    onClick={() => handleLiveToggle(poll.Poll_ID, poll.Live)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+                      poll.Live === "1" ? "bg-indigo-600" : "bg-gray-200"
+                    }`}
                   >
-                    <TrashIcon
-                      className="h-5 w-5 inline-block"
-                      aria-hidden="true"
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        poll.Live === "1" ? "translate-x-5" : "translate-x-0"
+                      }`}
                     />
                   </button>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleView(poll.Poll_ID)}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      title="View Poll"
+                    >
+                      <EyeIcon
+                        className="h-5 w-5 inline-block"
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <button
+                      onClick={() => handleEdit(poll.Poll_ID)}
+                      className="text-green-600 hover:text-green-800 font-medium"
+                      title="Edit Poll"
+                    >
+                      <PencilSquareIcon
+                        className="h-5 w-5 inline-block"
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(poll.Poll_ID)}
+                      className="text-red-600 hover:text-red-800 font-medium"
+                      title="Delete Poll"
+                    >
+                      <TrashIcon
+                        className="h-5 w-5 inline-block"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -369,19 +488,14 @@ export default function ScheduleTable({ onRefresh }) {
 
               {/* Page numbers */}
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                // Calculate which page numbers to show
                 let pageNum;
                 if (totalPages <= 5) {
-                  // Show all pages if 5 or fewer
                   pageNum = i + 1;
                 } else if (currentPage <= 3) {
-                  // Show 1,2,3,4,5 for first 3 pages
                   pageNum = i + 1;
                 } else if (currentPage >= totalPages - 2) {
-                  // Show last 5 pages
                   pageNum = totalPages - 4 + i;
                 } else {
-                  // Show currentPage-2, currentPage-1, currentPage, currentPage+1, currentPage+2
                   pageNum = currentPage - 2 + i;
                 }
 

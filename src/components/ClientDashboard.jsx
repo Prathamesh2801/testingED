@@ -29,6 +29,10 @@ import { API_BASE_URL } from "../config";
 import ClientSection from "./ClientSection";
 import BackgroundUpload from "./BackgroundUpload";
 import Schedule from "./Schedule/Schedule";
+import PollSection from "./PollsLayout/PollSection";
+import { BadgeAlertIcon, ChartBarStacked } from "lucide-react";
+import NotificationSection from "./Notification/NotificationSection";
+import { fetchEvents } from "../utils/EventFetchApi";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -48,39 +52,23 @@ export default function ClientDashboard() {
   };
 
   const [activeTab, setActiveTab] = useState(getActiveTab());
+  const [isAppEnabled, setIsAppEnabled] = useState(false);
+  const [isPollEnabled, setIsPollEnabled] = useState(false);
 
-  // Navigation configuration
-  const navigation = [
-    {
-      name: "Dashboard",
-      href: "#/clientDashboard?tab=dashboard",
-      icon: ChartPieIcon,
-      current: activeTab === "dashboard",
-    },
-    {
-      name: "User Data",
-      href: "#/clientDashboard?tab=userdata",
-      icon: UsersIcon,
-      current: activeTab === "userdata",
-    },
-    {
-      name: "Schedule",
-      href: "#/clientDashboard?tab=schedule",
-      icon: CalendarIcon,
-      current: activeTab === "schedule",
-    },
-    {
-      name: "Background",
-      href: "#/clientDashboard?tab=background",
-      icon: PhotoIcon,
-      current: activeTab === "background",
-    },
-  ];
+  //  Rendered According to Event Tab
+  useEffect(() => {
+    async function eventTabs() {
+      const eventId = localStorage.getItem("eventId");
+      const resp = await fetchEvents(eventId);
 
-  const userNavigation = [
-    { name: "Your profile", href: "#" },
-    { name: "Sign out", onClick: handleSignOut },
-  ];
+      if (resp && resp.Data && resp.Data.event) {
+        const event = resp.Data.event;
+        setIsAppEnabled(event.IsApp === "1" || event.IsApp === 1);
+        setIsPollEnabled(event.IsPoll === "1" || event.IsPoll === 1);
+      }
+    }
+    eventTabs();
+  }, []);
 
   // Update active tab when URL changes
   useEffect(() => {
@@ -120,6 +108,60 @@ export default function ClientDashboard() {
     navigate(`/clientLogin/${eventId}`);
   }
 
+  // Navigation configuration
+  const navigation = [
+    {
+      name: "Dashboard",
+      href: "#/clientDashboard?tab=dashboard",
+      icon: ChartPieIcon,
+      current: activeTab === "dashboard",
+    },
+    {
+      name: "User Data",
+      href: "#/clientDashboard?tab=userdata",
+      icon: UsersIcon,
+      current: activeTab === "userdata",
+    },
+    ...(isAppEnabled
+      ? [
+          {
+            name: "Schedule",
+            href: "#/clientDashboard?tab=schedule",
+            icon: CalendarIcon,
+            current: activeTab === "schedule",
+          },
+          {
+            name: "Notification",
+            href: "#/clientDashboard?tab=notification",
+            icon: BadgeAlertIcon,
+            current: activeTab === "notification",
+          },
+        ]
+      : []),
+    ...(isPollEnabled
+      ? [
+          {
+            name: "Poll",
+            href: "#/clientDashboard?tab=poll",
+            icon: ChartBarStacked,
+            current: activeTab === "poll",
+          },
+        ]
+      : []),
+    {
+      name: "Background",
+      href: "#/clientDashboard?tab=background",
+      icon: PhotoIcon,
+      current: activeTab === "background",
+    },
+  ];
+
+  // User dropdown items
+  const userNavigation = [
+    { name: "Your profile", href: "#" },
+    { name: "Sign out", onClick: handleSignOut },
+  ];
+
   // Render the appropriate component based on the active tab
   const renderContent = () => {
     switch (activeTab) {
@@ -128,7 +170,11 @@ export default function ClientDashboard() {
       case "userdata":
         return <ClientSection />;
       case "schedule":
-        return <Schedule />;
+        return isAppEnabled ? <Schedule /> : <ClientVisuals />;
+      case "notification":
+        return isAppEnabled ? <NotificationSection /> : <ClientVisuals />;
+      case "poll":
+        return isPollEnabled ? <PollSection /> : <ClientVisuals />;
       case "background":
         return <BackgroundUpload />;
       default:

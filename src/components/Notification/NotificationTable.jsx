@@ -1,14 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
-import { fetchScheduleAdmin, deleteSchedule } from "../../utils/Schedule";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+
+import {
+  MagnifyingGlassIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
 import toast from "react-hot-toast";
+import {
+  deleteNotifications,
+  fetchAllNotifications,
+} from "../../utils/Notifications";
 
-export default function ScheduleTable({ onRefresh }) {
+export default function NotificationTable({ onRefresh, onEdit }) {
   const eventId = localStorage.getItem("eventId");
-  const [scheduleData, setScheduleData] = useState([]);
+  const [notificationData, setNotificationData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,15 +25,15 @@ export default function ScheduleTable({ onRefresh }) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
-  const fetchSchedules = async () => {
+  const fetchNotifications = async () => {
     try {
       setLoading(true);
       console.log("Event Id in Schedule Table : ", eventId);
-      const response = await fetchScheduleAdmin(eventId);
+      const response = await fetchAllNotifications(eventId);
       console.log("Schedule Data:", response);
 
       if (response) {
-        setScheduleData(response);
+        setNotificationData(response);
 
         // Extract column names from the first item
         if (response.length > 0) {
@@ -35,7 +42,7 @@ export default function ScheduleTable({ onRefresh }) {
 
           // Filter out any internal keys or keys you want to always exclude
           const filteredColumns = allKeys.filter(
-            (key) => !["__v", "_id", "Created_AT", "Event_ID"].includes(key)
+            (key) => !["__v", "_id", "Event_ID"].includes(key)
           );
 
           setColumns(filteredColumns);
@@ -44,7 +51,7 @@ export default function ScheduleTable({ onRefresh }) {
         setError("Invalid data format received from API");
       }
     } catch (err) {
-      console.error("Error fetching schedule data:", err);
+      console.error("Error fetching notification data:", err);
       setError("Failed to load data. Please try again later.");
     } finally {
       setLoading(false);
@@ -52,16 +59,23 @@ export default function ScheduleTable({ onRefresh }) {
   };
 
   useEffect(() => {
-    fetchSchedules();
+    fetchNotifications();
   }, [eventId, onRefresh]);
 
-  async function handleDelete(scheduleId) {
+  const handleEdit = (notificationId) => {
+    console.log("Edit poll:", notificationId);
+    onEdit(notificationId);
+  };
+  async function handleDelete(notificationId) {
+    console.log("Notifu id before delete : ", notificationId);
     toast.promise(
-      deleteSchedule(eventId, scheduleId).then(() => fetchSchedules()),
+      deleteNotifications(eventId, notificationId).then(() =>
+        fetchNotifications()
+      ),
       {
-        loading: "Deleting schedule...",
-        success: "Schedule deleted successfully!",
-        error: "Failed to delete schedule.",
+        loading: "Deleting Notification...",
+        success: "Notification deleted successfully!",
+        error: "Failed to delete Notifications.",
       }
     );
   }
@@ -94,7 +108,9 @@ export default function ScheduleTable({ onRefresh }) {
 
   // Filter and sort data
   const filteredData = useMemo(() => {
-    let filtered = scheduleData.filter((item) => fuzzySearch(item, searchTerm));
+    let filtered = notificationData.filter((item) =>
+      fuzzySearch(item, searchTerm)
+    );
 
     // Apply sorting if a column is selected
     if (sortColumn) {
@@ -136,7 +152,7 @@ export default function ScheduleTable({ onRefresh }) {
     }
 
     return filtered;
-  }, [scheduleData, searchTerm, sortColumn, sortDirection]);
+  }, [notificationData, searchTerm, sortColumn, sortDirection]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -168,15 +184,22 @@ export default function ScheduleTable({ onRefresh }) {
 
   // Format cell content
   const formatCellContent = (key, value) => {
-    // Handle date fields
-    if (key.includes("Date") && value) {
-      const date = new Date(value);
-      return date.toLocaleDateString();
-    }
+    if (key === "Type") {
+      const colorClasses = {
+        error: "bg-red-500 text-white",
+        success: "bg-emerald-500 text-white",
+        warning: "bg-yellow-500 text-black",
+        info: "bg-blue-500 text-white",
+      };
 
-    // Handle time fields
-    if (key.includes("Time") && value) {
-      return value;
+      const badgeClass = colorClasses[value] || "bg-gray-500 text-white";
+      return (
+        <span
+          className={`inline-flex items-center rounded-full  px-2 py-1 text-xs font-medium  text-white  ${badgeClass} `}
+        >
+          {value}
+        </span>
+      );
     }
 
     // Default formatting for other values
@@ -189,7 +212,7 @@ export default function ScheduleTable({ onRefresh }) {
       <div className="min-h-[400px] flex justify-center items-center">
         <div className="animate-pulse flex flex-col items-center">
           <div className="rounded-full bg-gray-300 h-12 w-12 mb-4"></div>
-          <div className="text-gray-600">Loading schedule data...</div>
+          <div className="text-gray-600">Loading notification data...</div>
         </div>
       </div>
     );
@@ -208,13 +231,13 @@ export default function ScheduleTable({ onRefresh }) {
   }
 
   // Render empty state
-  if (scheduleData.length === 0) {
+  if (notificationData.length === 0) {
     return (
       <div className="min-h-[400px] flex justify-center items-center">
         <div className="text-gray-500 text-center">
-          <div className="text-2xl mb-2">No schedules available</div>
+          <div className="text-2xl mb-2">No Notification available</div>
           <div className="text-sm">
-            There are currently no schedule records to display.
+            There are currently no Notification records to display.
           </div>
         </div>
       </div>
@@ -226,7 +249,7 @@ export default function ScheduleTable({ onRefresh }) {
       {/* Search and controls */}
       <div className="p-4 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium leading-6 text-gray-900">
-          Event Schedule
+          Event Notifications
         </h3>
 
         <div className="mt-3 sm:mt-0 sm:ml-4 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -241,7 +264,7 @@ export default function ScheduleTable({ onRefresh }) {
             <input
               type="text"
               className="block w-full rounded-2xl border-0 py-1.5 pl-10 px-16 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
-              placeholder="Search schedules..."
+              placeholder="Search notifications..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -320,7 +343,17 @@ export default function ScheduleTable({ onRefresh }) {
                 ))}
                 <td className="px-6 py-4 space-x-6 whitespace-nowrap text-sm text-gray-800">
                   <button
-                    onClick={() => handleDelete(item.ID)}
+                    onClick={() => handleEdit(item.Notification_ID)}
+                    className="text-green-600 hover:text-green-800 font-medium"
+                    title="Delete Schedule"
+                  >
+                    <PencilSquareIcon
+                      className="h-5 w-5 inline-block"
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.Notification_ID)}
                     className="text-red-600 hover:text-red-800 font-medium"
                     title="Delete Schedule"
                   >
