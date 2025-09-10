@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import  QrScanner  from "react-qr-scanner"
 import { Camera, CameraOff, Check, X, RefreshCw } from "lucide-react"
 import { userScanner } from "../utils/ClientData"
+import toast from "react-hot-toast"
 
 export default function QRScanner() {
   const [result, setResult] = useState(null)
@@ -34,8 +35,6 @@ export default function QRScanner() {
     if (data) {
       setResult(data.text)
       setScanning(false)
-      // Here you would call your authorization API with the QR code data
-      // Example: checkAuthorization(data.text);
       checkAuthorization(data.text)
     }
   }
@@ -51,12 +50,23 @@ export default function QRScanner() {
     setScanning(true)
   }
 
-  // Mock function for future API integration
-   const checkAuthorization = async (qrData) => {
+  const checkAuthorization = async (qrData) => {
+  try {
     const response = await userScanner(qrData);
-    setScannerResponse(response.Message);
-    console.log("Checking Response ",response)
+    setScannerResponse(response.Message); // success message
+    // console.log("Checking Response ", response);
+    toast.success(response.Message)
+  } catch (error) {
+    // Server returned 500 or any other issue
+    toast.error(error.response?.data?.Message || "Authorization failed");
+    if (error.response?.data?.Message) {
+      setScannerResponse(error.response.data.Message); 
+    } else {
+      setScannerResponse("An unexpected error occurred while checking authorization.");
+    }
+    // console.error("Authorization Check Error:", error);
   }
+};
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">

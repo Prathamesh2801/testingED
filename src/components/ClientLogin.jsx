@@ -65,6 +65,9 @@ export default function ClientLogin() {
       } else if (response.Role === "Scanner") {
         navigate("/qrscan");
       }
+      else if (response.Role === "faceDetect") {
+        navigate("/faceDetect");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       setErrorMessage(error.message || "Invalid username or password");

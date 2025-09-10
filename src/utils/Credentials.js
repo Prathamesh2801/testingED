@@ -1,18 +1,15 @@
-import qs from 'qs';
+import qs from "qs";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 
 export async function getAllCredentials() {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/Admin/client.php`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/Admin/client.php`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     if (response.data?.Status !== true) {
       throw new Error("Server returned an error status");
@@ -25,15 +22,16 @@ export async function getAllCredentials() {
   }
 }
 
-
-
 export async function createCredential({ username, password, role, eventId }) {
   try {
     const formData = qs.stringify({
       Username: username,
       Password: password,
       Role: role,
-      Event_ID: role === "Client" || role === "Scanner" ? eventId : ''
+      Event_ID:
+        role === "Client" || role === "Scanner" || role === "faceDetect"
+          ? eventId
+          : "",
     });
 
     const response = await axios.post(
@@ -41,9 +39,9 @@ export async function createCredential({ username, password, role, eventId }) {
       formData,
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
     );
 
@@ -58,21 +56,17 @@ export async function createCredential({ username, password, role, eventId }) {
   }
 }
 
-
 export async function deleteCredential(credentialId) {
   try {
-    const response = await axios.delete(
-      `${API_BASE_URL}/Admin/client.php`,
-      {
-        params: {
-          Username: credentialId
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
-      }
-    );
+    const response = await axios.delete(`${API_BASE_URL}/Admin/client.php`, {
+      params: {
+        Username: credentialId,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     if (response.data?.Status !== true) {
       throw new Error("Failed to delete credential");

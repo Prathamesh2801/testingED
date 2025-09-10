@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { API_BASE_URL, NETWORK_ADDRESS } from "../config";
 import { getEventById } from "../utils/EventFetchApi";
 import { QRCodeCanvas } from "qrcode.react";
@@ -11,6 +11,14 @@ export default function ViewEvent({ viewEventId }) {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     const url = `${NETWORK_ADDRESS}/eventForm/${viewEventId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      toast.success("URL copied to clipboard!", { duration: 2000 });
+      setTimeout(() => setCopied(false), 2000); // reset after 2 sec
+    });
+  };
+  const handleCopyClientLogin = () => {
+    const url = `${NETWORK_ADDRESS}/clientLogin/${viewEventId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       toast.success("URL copied to clipboard!", { duration: 2000 });
@@ -62,8 +70,9 @@ export default function ViewEvent({ viewEventId }) {
     IsPoll,
     IsApp,
     Table_Structure,
+    Unique_Column_Name,
   } = eventDetails;
-
+  
   return (
     <div className="max-w-5xl mx-auto">
       <h2 className="text-2xl font-semibold mb-6">Event Details</h2>
@@ -123,18 +132,27 @@ export default function ViewEvent({ viewEventId }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={handleCopy}
-            className="mt-2 py-1 px-3 md:w-1/3 col-span-2 md:col-span-1  text-md font-semibold  outline-2 outline-emerald-700 text-emerald-700 rounded hover:bg-emerald-700  hover:outline-none hover:text-white transition duration-200 ease-in-out"
-          >
-            Copy URL
-          </button>
+          <div className="flex flex-col md:flex-row  md:col-span-1 col-span-2 justify-around  ">
+            <button
+              onClick={handleCopy}
+              className="mt-2 py-1 px-3 md:w-1/3 col-span-2 md:col-span-1  text-md font-semibold  outline-2 outline-emerald-700 text-emerald-700 rounded hover:bg-emerald-700  hover:outline-none hover:text-white transition duration-200 ease-in-out"
+            >
+              Copy URL
+            </button>
+            <button
+              onClick={handleCopyClientLogin}
+              className="mt-2 py-1 px-3 md:w-1/3 col-span-2 md:col-span-1  text-md font-semibold  outline-2 outline-emerald-700 text-emerald-700 rounded hover:bg-emerald-700  hover:outline-none hover:text-white transition duration-200 ease-in-out"
+            >
+              Copy CL
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Fields Summary */}
       <div className="mb-8 p-6 border rounded-lg bg-gray-50">
         <h3 className="text-lg font-medium mb-4">Event Fields</h3>
+
         {Table_Structure && Table_Structure.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -148,6 +166,9 @@ export default function ViewEvent({ viewEventId }) {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Required
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unique Column (User ID)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Comment
@@ -185,6 +206,10 @@ export default function ViewEvent({ viewEventId }) {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {col.IsNull ? "No" : "Yes"}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {col.Name === Unique_Column_Name ? "Yes" : "No"}
+                      </td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {commentObj.Type === "FILE"
                           ? `Max size: ${(

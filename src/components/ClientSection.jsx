@@ -63,13 +63,7 @@ export default function ClientSection() {
     renderEvents();
   }, [eventId]);
 
-  // Prevent manually going to ?view=create when face-rec is on
-  useEffect(() => {
-    if (isFaceRecEnabled && view === "create") {
-      setView("display");
-      navigate({ search: "?view=display" });
-    }
-  }, [isFaceRecEnabled, view, navigate]);
+  
 
   // Toggle display/create views
   const toggleView = () => {
@@ -259,7 +253,7 @@ export default function ClientSection() {
           </button>
         )}
         <div className="mx-auto md:ml-auto md:mx-0 flex items-center space-x-4">
-          {!fileConfig && (
+          {!fileConfig && !isFaceRecEnabled && (
             <button
               onClick={handleUploadClick}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[linear-gradient(121deg,_#92BDFF_31.23%,_#369DC9_108.38%)] rounded-[15px] cursor-pointer hover:bg-[linear-gradient(121deg,_#369DC9_31.23%,_#92BDFF_108.38%)]"

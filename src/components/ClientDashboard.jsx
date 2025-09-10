@@ -274,16 +274,17 @@ export default function ClientDashboard() {
                     )}
 
                     <li className="mt-auto">
-                      <a
+                      {/* <a
                         href="#"
                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                        disabled
                       >
                         <Cog6ToothIcon
                           aria-hidden="true"
                           className="size-6 shrink-0 text-gray-400 group-hover:text-[#36C95F] "
                         />
                         Settings
-                      </a>
+                      </a> */}
                     </li>
 
                     {/* Add Sign Out option directly in the mobile sidebar */}
@@ -350,7 +351,7 @@ export default function ClientDashboard() {
                 </li>
 
                 <li className="mt-auto">
-                  <a
+                  {/* <a
                     href="#"
                     className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
                   >
@@ -359,7 +360,7 @@ export default function ClientDashboard() {
                       className="size-6 shrink-0 text-gray-400 group-hover:text-indigo-600"
                     />
                     Settings
-                  </a>
+                  </a> */}
                 </li>
               </ul>
             </nav>
